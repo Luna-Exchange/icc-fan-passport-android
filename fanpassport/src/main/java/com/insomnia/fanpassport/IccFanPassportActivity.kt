@@ -3,12 +3,15 @@ package com.insomnia.fanpassport
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -18,6 +21,7 @@ const val SHARED_PREF = "MyPrefs"
 class IccFanPassportActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var progressBar : ProgressBar
     private var currentUrl: String? = null
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
@@ -29,6 +33,8 @@ class IccFanPassportActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
         webView = findViewById(R.id.web_view)
+        progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+
         val webSettings = webView.settings
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.javaScriptEnabled = true
@@ -38,11 +44,18 @@ class IccFanPassportActivity : AppCompatActivity() {
         webView.loadUrl("https://starter.mintbase.xyz")
 
         webView.webViewClient = object : WebViewClient() {
+
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                progressBar.visibility = View.VISIBLE;
+
+            }
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 return true
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
+                progressBar.visibility = View.GONE;
                 webView.loadUrl(
                     "javascript:(function() {" +
                             "window.parent.addEventListener ('click', function(event) {" +
