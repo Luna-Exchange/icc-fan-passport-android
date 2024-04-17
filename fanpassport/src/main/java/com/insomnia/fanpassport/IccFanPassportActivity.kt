@@ -10,7 +10,6 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
-import com.insomnia.passport.WebAppInterface
 
 
 const val CURRENT_URL = "currentUrl"

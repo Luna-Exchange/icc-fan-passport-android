@@ -1,4 +1,4 @@
-package com.insomnia.passport
+package com.insomnia.fanpassport
 
 import android.content.Context
 import android.webkit.JavascriptInterface
