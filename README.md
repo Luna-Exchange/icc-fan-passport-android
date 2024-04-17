@@ -11,7 +11,7 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 `implementation 'com.insomnia:fanpassport:x.x.x'`
 
-where `x.x.x` is the version
+where `x.x.x` is the latest version `1.0.6`
 
 2. In settings.gradle
 
