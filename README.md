@@ -1,3 +1,6 @@
+An Android SDK that provides a simple way to launch a web view in android applications.
+
+
 1. Add the dependency to your build.gradle.
 
 **Kotlin** 
