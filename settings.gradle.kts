@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "iccfanpassport"
 include(":app")
- 
+include(":fanpassport")

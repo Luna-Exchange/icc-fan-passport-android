@@ -1,4 +1,4 @@
-package com.insomnia.iccfanpassport
+package com.insomnia.fanpassport
 
 import org.junit.Test
 
