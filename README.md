@@ -11,7 +11,7 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 `implementation 'com.insomnia:fanpassport:x.x.x'`
 
-where `x.x.x` is the latest version `1.0.6`
+where `x.x.x` is the latest version `1.0.8`
 
 2. In settings.gradle
 
@@ -49,5 +49,12 @@ where `x.x.x` is the latest version `1.0.6`
 3. Sync the project.
 
 4. Start the SDK with
-`IccFanPassportActivity.start(context)`           
-
+``` 
+IccFanPassportActivity.Builder(this)
+            .accessToken("")
+            .email("")
+            .name("")
+            .userName("")
+            .build()
+```
+Where accessToken, email, name and username are passed from the ICC app.
