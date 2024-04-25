@@ -49,8 +49,8 @@ publishing {
             name  "GitHubPackages"
             url uri('https://maven.pkg.github.com/Luna-Exchange/icc-fan-passport-android')
             credentials {
-                username = "falay"
-                password = "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"
+                username = ""
+                password = ""
             }
         }
     }
