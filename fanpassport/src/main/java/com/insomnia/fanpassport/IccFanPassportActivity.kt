@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.flowWithLifecycle
@@ -25,8 +26,8 @@ const val PASSPORT_URL = "https://icc-fan-passport-staging.vercel.app/?passport_
 class IccFanPassportActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
-    private lateinit var progressBar : ProgressBar
-    private  val viewModel: FanPassportViewModel by viewModels()
+    private lateinit var progressBar: ProgressBar
+    private val viewModel: FanPassportViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class IccFanPassportActivity : AppCompatActivity() {
                 progressBar.visibility = View.VISIBLE
 
             }
+
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 return true
             }
@@ -88,12 +90,24 @@ class IccFanPassportActivity : AppCompatActivity() {
         viewModel.encodeUser(user)
     }
 
-    private fun loadUrl(token: String) {
-        val url = PASSPORT_URL + token
-        webView.loadUrl(url)
+    private fun loadUrl(result: Result) {
+        when (result) {
+            is Result.Success -> {
+                val url = PASSPORT_URL + result.token
+                webView.loadUrl(url)
+            }
+
+            is Result.Failed -> {
+                Toast.makeText(
+                    this,
+                    "Could not complete Auth Flow ${result.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
-     class Builder(private val context: Context) {
+    class Builder(private val context: Context) {
         private var accessToken: String = ""
         private var name: String = ""
         private var email: String = ""
@@ -106,10 +120,10 @@ class IccFanPassportActivity : AppCompatActivity() {
 
         fun build() {
             val intent = Intent(context, IccFanPassportActivity::class.java)
-            val user = User(authToken = accessToken, name = name, email = email, username = userName)
+            val user =
+                User(authToken = accessToken, name = name, email = email, username = userName)
             intent.putExtra(USER_EXTRA, user)
             context.startActivity(intent)
         }
     }
-
 }
