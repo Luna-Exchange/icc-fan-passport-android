@@ -5,11 +5,11 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 **Kotlin** 
 
-`implementation("com.insomnia:fanpassport:x.x.x")`
+`implementation("com.github.Luna-Exchange:icc-fan-passport-android:x.x.x")`
 
 **Groovy**
 
-`implementation 'com.insomnia:fanpassport:x.x.x'`
+`implementation 'com.github.Luna-Exchange:icc-fan-passport-android:x.x.x`
 
 where `x.x.x` is the latest version `1.0.8`
 
@@ -18,33 +18,28 @@ where `x.x.x` is the latest version `1.0.8`
 **Kotlin**
 
 ```
-
-    maven {
-            url = uri("https://maven.pkg.github.com/Luna-Exchange/icc-fan-passport-android")
-            credentials {
-                username = property("gpr.user")
-                 password = property("gpr.token")
-                                }
-                   }
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
 
 ```
         
         
 **Groovy**
 
-
 ```
-  maven {
-            url 'https://maven.pkg.github.com/Luna-Exchange/icc-fan-passport-android'
-            credentials {
-                username = property("gpr.user")
-                password = property("gpr.token")
-            }
-        }
+dependencyResolutionManagement {
+		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+		repositories {
+			mavenCentral()
+			maven { url 'https://jitpack.io' }
+		}
+	}
 ```
-
-                
- Where the GitHub user and token is saved in a `github.properties` file     
 
 3. Sync the project.
 
