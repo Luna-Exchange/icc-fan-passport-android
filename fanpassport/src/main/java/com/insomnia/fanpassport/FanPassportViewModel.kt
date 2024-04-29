@@ -47,5 +47,5 @@ sealed class Result {
 
 }
 @Parcelize
-data class User(val authToken: String, val name: String, val email: String, val username: String) :
+data class User(val authToken: String, val name: String, val email: String) :
     Parcelable
