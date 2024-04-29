@@ -111,17 +111,15 @@ class IccFanPassportActivity : AppCompatActivity() {
         private var accessToken: String = ""
         private var name: String = ""
         private var email: String = ""
-        private var userName: String = ""
 
         fun accessToken(accessToken: String) = apply { this.accessToken = accessToken }
         fun name(name: String) = apply { this.name = name }
         fun email(email: String) = apply { this.email = email }
-        fun userName(userName: String) = apply { this.userName = userName }
 
         fun build() {
             val intent = Intent(context, IccFanPassportActivity::class.java)
             val user =
-                User(authToken = accessToken, name = name, email = email, username = userName)
+                User(authToken = accessToken, name = name, email = email)
             intent.putExtra(USER_EXTRA, user)
             context.startActivity(intent)
         }

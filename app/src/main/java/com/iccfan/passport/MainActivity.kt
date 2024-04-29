@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
             )
             .email("iyanuoluwa@insomnialabs.io")
             .name("Iyanu Falaye")
-            .userName("Iyanu Falaye")
             .build()
     }
 }
