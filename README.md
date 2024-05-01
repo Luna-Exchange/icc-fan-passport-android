@@ -11,7 +11,7 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 `implementation 'com.github.Luna-Exchange:icc-fan-passport-android:x.x.x`
 
-where `x.x.x` is the latest version `1.0.1`
+where `x.x.x` is the latest version `1.0.2`
 
 2. In settings.gradle
 
