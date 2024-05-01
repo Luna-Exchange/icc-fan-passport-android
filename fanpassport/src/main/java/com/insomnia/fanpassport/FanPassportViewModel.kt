@@ -31,7 +31,7 @@ class FanPassportViewModel : ViewModel() {
                         mToken.emit(Result.Failed(it.message ?: ""))
                     }
                 tokenFlow.collect {
-                    mToken.emit(Result.Success(it.token))
+                    mToken.emit(Result.Success(it.data.token))
                 }
             } catch (e : Exception) {
 
