@@ -49,9 +49,17 @@ IccFanPassportActivity.Builder(this)
             .accessToken("")
             .email("")
             .name("")
+            .entryPoint(EntryPoint.DEFAULT)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 ```
-Where accessToken, email, onNavigateBack() and name are passed from the ICC app.
+Where accessToken, email, onNavigateBack(), name are passed from the ICC app and entryPoint takes an enum;
+
+DEFAULT -> default web URL
+CREATE_AVATAR -> Create avatar page
+ONBOARDING -> Onboarding page
+PROFILE -> Profile page
+CHALLENGES -> Challenges page
+REWARDS -> Rewards page
 
 onNavigateBack() >> Where you want to navigate to after the SDK has been closed on when Back to ICC is pressed on the web
