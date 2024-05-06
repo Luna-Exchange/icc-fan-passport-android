@@ -55,11 +55,11 @@ IccFanPassportActivity.Builder(this)
 ```
 Where accessToken, email, onNavigateBack(), name are passed from the ICC app and entryPoint takes an enum;
 
-DEFAULT -> default web URL
-CREATE_AVATAR -> Create avatar page
-ONBOARDING -> Onboarding page
-PROFILE -> Profile page
-CHALLENGES -> Challenges page
-REWARDS -> Rewards page
+**DEFAULT** -> default web URL
+**CREATE_AVATAR**  -> Create avatar page
+**ONBOARDING**  -> Onboarding page
+**PROFILE**  -> Profile page
+**CHALLENGES**  -> Challenges page
+**REWARDS**  -> Rewards page
 
 onNavigateBack() >> Where you want to navigate to after the SDK has been closed on when Back to ICC is pressed on the web
