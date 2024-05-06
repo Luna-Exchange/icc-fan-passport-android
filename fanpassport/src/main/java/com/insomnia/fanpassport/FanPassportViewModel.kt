@@ -49,3 +49,7 @@ sealed class Result {
 @Parcelize
 data class User(val authToken: String, val name: String, val email: String) :
     Parcelable
+
+@Parcelize
+data class ActivityParam(val user: User, val path : String) :
+    Parcelable
