@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 const val PARAM_EXTRA = "USER_DETAILS"
 
-class IccFanPassportActivity : AppCompatActivity() {
+class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
@@ -44,7 +44,7 @@ class IccFanPassportActivity : AppCompatActivity() {
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
-        webView.addJavascriptInterface(WebAppInterface(this), "Android")
+        webView.addJavascriptInterface(WebAppInterface( this), "Android")
 
         webView.webViewClient = object : WebViewClient() {
 
@@ -61,9 +61,10 @@ class IccFanPassportActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 webView.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
+                background.visibility = View.GONE
                 webView.loadUrl(
                     "javascript:(function() {" +
-                            "window.parent.addEventListener ('click', function(event) {" +
+                            "window.parent.addEventListener ('navigate-to-icc', function(event) {" +
                             " Android.receiveEvent(JSON.stringify(event));});" +
                             "})()"
                 )
@@ -119,7 +120,7 @@ class IccFanPassportActivity : AppCompatActivity() {
         private var name: String = ""
         private var email: String = ""
         private var entryPoint: EntryPoint = EntryPoint.DEFAULT
-        lateinit var onNavigateBack: () -> Unit
+        private lateinit var onNavigateBack: () -> Unit
 
         private val resultLauncher = activity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -141,5 +142,9 @@ class IccFanPassportActivity : AppCompatActivity() {
             intent.putExtra(PARAM_EXTRA, param)
             resultLauncher.launch(intent)
         }
+    }
+
+    override fun onNavigateBack() {
+        finish()
     }
 }

@@ -1,14 +1,16 @@
 package com.insomnia.fanpassport
 
-import android.content.Context
 import android.webkit.JavascriptInterface
-import android.widget.Toast
 
-class WebAppInterface(private val mContext: Context) {
+class WebAppInterface(private val onJavScriptInterface: OnJavScriptInterface) {
 
     @JavascriptInterface
     fun receiveEvent(data: String): Boolean {
+        onJavScriptInterface.onNavigateBack()
         return true
     }
+}
 
+interface OnJavScriptInterface{
+    fun onNavigateBack()
 }
