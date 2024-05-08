@@ -1,4 +1,4 @@
-package com.insomnia.passport.listeners
+package com.insomnia.fanpassport
 
 import android.app.Activity
 import android.net.Uri
@@ -12,7 +12,6 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
-import com.insomnia.fanpassport.CredentialManagerHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
