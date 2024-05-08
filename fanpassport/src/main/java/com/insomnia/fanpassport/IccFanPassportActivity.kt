@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
@@ -44,7 +46,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
-        webView.addJavascriptInterface(WebAppInterface( this), "Android")
+        webView.addJavascriptInterface(WebAppInterface(this), "Android")
 
         webView.webViewClient = object : WebViewClient() {
 
@@ -99,9 +101,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
     private fun loadUrl(result: Result) {
         when (result) {
             is Result.Success -> {
-                val baseUrl =
-                    "https://icc-fan-passport-staging.vercel.app${arguments?.path}?passport_access="
-                val url = baseUrl + result.token
+                val url = "https://icc-fan-passport-staging.vercel.app${arguments?.path}?passport_access=${result.token}"
                 webView.loadUrl(url)
             }
 
@@ -147,4 +147,5 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
     override fun onNavigateBack() {
         finish()
     }
+
 }
