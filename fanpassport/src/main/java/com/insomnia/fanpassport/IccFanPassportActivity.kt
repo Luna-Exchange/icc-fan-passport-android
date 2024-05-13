@@ -61,7 +61,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 if (url.contains(MINT_BASE_HOST)) {
-                    launchInAppBrowser("https://wallet.mintbase.xyz/connect?success_url=fanpassport://mintbase.xyz")
+                    launchInAppBrowser("https://wallet.mintbase.xyz/connect?success_url=iccdev://mintbase.xyz")
                 }
                 return true
             }
@@ -118,10 +118,8 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
             is Result.Success -> {
                 val url =
                     if (!arguments?.accountId.isNullOrEmpty()) {
-                        Log.e( "APP","Deep link")
                         isDeepLinkFromWallet(result.token)
                     } else {
-                        Log.e("APP","Normal link")
                         "https://icc-fan-passport-staging.vercel.app${arguments?.path}?passport_access=${result.token}"
                     }
                 loadUrlWithWebView(url)
