@@ -50,6 +50,8 @@ IccFanPassportActivity.Builder(this)
             .email("")
             .name("")
             .entryPoint(EntryPoint.DEFAULT)
+            .accountId(accountId)
+            .publicKey(publicKey)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 ```
@@ -63,3 +65,39 @@ Where accessToken, email, onNavigateBack(), name are passed from the ICC app and
 **REWARDS**  -> Rewards page
 
 onNavigateBack() >> Where you want to navigate to after the SDK has been closed on when Back to ICC is pressed on the web
+
+**Wallet Creation Flow**
+
+To create a wallet on a fan passport, the deep link needs to be set to add **accountId** and **publicKey** to the builder method to complete the wallet creation flow.
+
+1. open SDK using the initialization method as shown below
+
+``` 
+IccFanPassportActivity.Builder(this)
+            .accessToken("")
+            .email("")
+            .name("")
+            .entryPoint(EntryPoint.DEFAULT)
+	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
+            .build()
+```
+
+2. click on Create Wallet in the fan passport module, and an in-app browser is launched.
+3. after creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the initialization method with the **publicKey** and **accountId** as shown below.
+
+``` 
+IccFanPassportActivity.Builder(this)
+            .accessToken("")
+            .email("")
+            .name("")
+            .entryPoint(EntryPoint.DEFAULT)
+            .accountId(accountId)
+            .publicKey(publicKey)
+	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
+            .build()
+```
+4. Wallet created.
+
+
+
+
