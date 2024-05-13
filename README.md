@@ -69,10 +69,17 @@ onNavigateBack() >> Where you want to navigate to after the SDK has been closed 
 **Wallet Creation Flow**
 
 To create a wallet on a fan passport, the deep link needs to be set to add **accountId** and **publicKey** to the builder method to complete the wallet creation flow.
+1. Add this to the manifest under the activity that will resolve the deep link
 
-1. open SDK using the initialization method as shown below
+```
+<data android:scheme="iccdev" />
+                <data android:host="mintbase.xyz" />
 
 ``` 
+
+2. open SDK using the initialization method as shown below
+```
+
 IccFanPassportActivity.Builder(this)
             .accessToken("")
             .email("")
@@ -82,8 +89,8 @@ IccFanPassportActivity.Builder(this)
             .build()
 ```
 
-2. click on Create Wallet in the fan passport module, and an in-app browser is launched.
-3. after creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the initialization method with the **publicKey** and **accountId** as shown below.
+3. click on Create Wallet in the fan passport module, and an in-app browser is launched.
+4. after creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the initialization method with the **publicKey** and **accountId** as shown below.
 
 ``` 
 IccFanPassportActivity.Builder(this)
@@ -96,7 +103,7 @@ IccFanPassportActivity.Builder(this)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 ```
-4. Wallet created.
+5. Wallet created.
 
 
 
