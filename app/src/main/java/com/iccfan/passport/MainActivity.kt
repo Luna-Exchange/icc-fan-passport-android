@@ -19,13 +19,14 @@ class MainActivity : AppCompatActivity() {
 
         val intent = intent
         val data = intent.data
-            val accountId = data?.getQueryParameter("account_id") ?: ""
-            val publicKey = data?.getQueryParameter("public_key") ?: ""
+        val accountId = data?.getQueryParameter("account_id") ?: ""
+        val publicKey = data?.getQueryParameter("public_key") ?: ""
 
         IccFanPassportActivity.Builder(this).accessToken(
-            "eyJhbGciOiJSUzI1NiIsImtpZCI6Imlia2V5MTIzNDUiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIxODA5YzQzZS0wOTJmLTRjY2ItOWU2Zi1kYjFkYzk2NTQ2ZWQiLCJwcm9maWxlX2lkIjoiMTgwOWM0M2UtMDkyZi00Y2NiLTllNmYtZGIxZGM5NjU0NmVkIiwiaWRwX3N1YiI6IjZlNWY5YTU4LTJiYTctNDU4NS04NmE2LWFlNTk4NmFmMWNjYyIsInRlbmFudF9pZCI6ImljY2RldiIsImp0aSI6ImMzYmYwMTdiLTNjNDctNGU2ZS1hMjc3LWMwZTkxMDA1NDA2MCIsInNpZCI6ImMzYmYwMTdiLTNjNDctNGU2ZS1hMjc3LWMwZTkxMDA1NDA2MCIsImRldmljZV9pZCI6ImYyZTFkNTI2LTM1ZDgtNGVhYi04ZWIwLWE2NDgzMTRmNDU0MCIsImRldmljZV90eXBlIjoid2ViX2Jyb3dzZXIiLCJyb2xlIjoidXNlciIsInNjb3BlIjoiY2F0YWxvZ3VlLnJlYWQiLCJ0eXAiOiJhY2Nlc3MiLCJhenAiOiI3ZDE4Y2I2Ni01YmFmLTQ5NzktODVjMy05YTZjYzM3ZTYyMmUiLCJpZHBfYmFnIjp7InByb3ZpZGVyIjoiQURCMkMiLCJ0ZnAiOiJCMkNfMUFfU0lHTklOU0lHTlVQIn0sImF1ZCI6ImRldi1zY2FsZS1mcmFua2Z1cnQtYXdzIiwiZXhwIjoxNzE1NTY0MDE5LCJpc3MiOiJodHRwczovL2RlbHRhdHJlLmNvbS9pc3N1ZXIiLCJpYXQiOjE3MTU1NjIyMTksIm5iZiI6MTcxNTU2MjIxOX0.qu7l78JGcJwlWKmwaGgY5vEh_EIjOi1apc0mqDjDbG2Q6tIChkEi04wA_SHlHXOw2ULxyksOXWhEpOexQAMsdYVZJsQC3GFsfZEILQXe2p2XG9dLJfdlQi6J88wiYq4Fjtowc4BAv3UsXuWoXXhmrh92aSiaULeeScCJQhKUIlooPVOlX2rTgiYW3CEOAwxTzjA7LHrWLgUEa5WnImSt_rHGDpan7SjcdRnevaUQEYNuvxom-6ahbj0OFowVXaTizXpW6D6ASGuHqTDrS6Bh5t9gF3lNJQ1XGu0ATQ4ccPN3QcDAqWh33lBfQWEMb2ACm-IcizlQsMusC8RfIJjRsA").email("iyanuc.falaye@gmail.com")
+            "eyJhbGciOiJSUzI1NiIsImtpZCI6Imlia2V5MTIzNDUiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIxODA5YzQzZS0wOTJmLTRjY2ItOWU2Zi1kYjFkYzk2NTQ2ZWQiLCJwcm9maWxlX2lkIjoiMTgwOWM0M2UtMDkyZi00Y2NiLTllNmYtZGIxZGM5NjU0NmVkIiwiaWRwX3N1YiI6IjZlNWY5YTU4LTJiYTctNDU4NS04NmE2LWFlNTk4NmFmMWNjYyIsInRlbmFudF9pZCI6ImljY2RldiIsImp0aSI6IjVhYzY0YjRkLWRlZDMtNGQxZi04NzJkLWU2YTM3OTE3ZWFjOSIsInNpZCI6IjVhYzY0YjRkLWRlZDMtNGQxZi04NzJkLWU2YTM3OTE3ZWFjOSIsImRldmljZV9pZCI6IjMwNDQzODZiLTNiYjgtNDViMy1hYWE0LWRlNTZiY2IxNTY5ZCIsImRldmljZV90eXBlIjoid2ViX2Jyb3dzZXIiLCJyb2xlIjoidXNlciIsInNjb3BlIjoiY2F0YWxvZ3VlLnJlYWQiLCJ0eXAiOiJhY2Nlc3MiLCJhenAiOiI3ZDE4Y2I2Ni01YmFmLTQ5NzktODVjMy05YTZjYzM3ZTYyMmUiLCJpZHBfYmFnIjp7InByb3ZpZGVyIjoiQURCMkMiLCJ0ZnAiOiJCMkNfMUFfU0lHTklOU0lHTlVQIn0sImF1ZCI6ImRldi1zY2FsZS1mcmFua2Z1cnQtYXdzIiwiZXhwIjoxNzE1NzcxMTcyLCJpc3MiOiJodHRwczovL2RlbHRhdHJlLmNvbS9pc3N1ZXIiLCJpYXQiOjE3MTU3NjkzNzIsIm5iZiI6MTcxNTc2OTM3Mn0.cT3dge4YvnOZ5pIqaDWgWILTdEHVoy2K8kx8CZ1EE6TDh3avHJs0RlD2y1HYkmG5CDXRBs34At6vH2PDmHITrSUp8hfytsRkt2-hTxO_Lxb1LFjmSnv1_ScK9ByUbAo_ZapacLJb_DqgKkQ0xi3mhg0Kl9Grf6woHoWiEObk-lRiqA3NzNTcvvfR3J_B6st-D5KY3g3iJowMKI5skUbwI90wN5kiafvG0dqraS6hoWzWMt_1b9G3q6ILobiqsH47Dg5FPQdQRVC5RY_9AthpqUc5VRfaUssVjwOQa254iB9EkZQqBSq2LLRE0uAYLCZOlneq4qu2bNd60NSIhB_lHw"        )
             .name("John Doe")
-            .entryPoint(EntryPoint.PROFILE)
+            .email("iyanuc.falaye@google.com")
+            .entryPoint(EntryPoint.PROFILE.path)
             .accountId(accountId)
             .publicKey(publicKey)
             .onNavigateBack {

@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object FanPassportApiClient {
 
-    private const val BASE_URL = "https://icc-fan-passport-stg-api.insomnialabs.xyz/"
+    private const val BASE_URL = "https://passport-api.icc-cricket.com/"
     fun create(): FanPassportAPIService {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
