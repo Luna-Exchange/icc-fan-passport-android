@@ -109,9 +109,48 @@ IccFanPassportActivity.Builder(this)
 PS:
 To get the **publicKey** and **accountId** via deep linking, intents will be used via the activity that receives the deep linking, and then you can send the public key to the fan passport SDK.
 
-``` 
+1. In the Manifest.
 
 ```
+  <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="wallet.mintbase.xyz" />
+                <data android:scheme="fanpassport" />
+                <data android:host="mintbase.xyz" />
+            </intent-filter>
+        </activity>
+```
+
+2. In the activity.
+
+``` 
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val pbText = findViewById<TextView>(R.id.public_key)
+        val aidText = findViewById<TextView>(R.id.account_id)
+
+
+        val intent = intent
+        val data = intent.data
+        val accountId = data?.getQueryParameter("account_id") ?: ""
+        val publicKey = data?.getQueryParameter("public_key") ?: ""
+
+	}
+	}
+
+```
+
+3. Then send the **publicKey** and **accountId** to the fan passport.
 
 
 
