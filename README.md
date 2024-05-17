@@ -50,18 +50,21 @@ IccFanPassportActivity.Builder(this)
             .email("")
             .name("")
             .entryPoint(EntryPoint.DEFAULT)
-            .accountId(accountId)
-            .publicKey(publicKey)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 ```
 Where accessToken, email, onNavigateBack(), name are passed from the ICC app and entryPoint takes an enum;
 
 **DEFAULT** -> default web URL
+
 **CREATE_AVATAR**  -> Create avatar page
+
 **ONBOARDING**  -> Onboarding page
+
 **PROFILE**  -> Profile page
+
 **CHALLENGES**  -> Challenges page
+
 **REWARDS**  -> Rewards page
 
 onNavigateBack() >> Where you want to navigate to after the SDK has been closed on when Back to ICC is pressed on the web
@@ -72,7 +75,7 @@ To create a wallet on a fan passport, the deep link needs to be set to add **acc
 1. Add this to the manifest under the activity that will resolve the deep link
 
 ```
-<data android:scheme="iccdev" />
+               <data android:scheme="iccdev" />
                 <data android:host="mintbase.xyz" />
 
 ``` 
@@ -119,9 +122,7 @@ To get the **publicKey** and **accountId** via deep linking, intents will be use
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" />
-                <data android:host="wallet.mintbase.xyz" />
-                <data android:scheme="fanpassport" />
+                <data android:scheme="iccdev" />
                 <data android:host="mintbase.xyz" />
             </intent-filter>
         </activity>
@@ -150,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
 ```
 
-3. Then send the **publicKey** and **accountId** to the fan passport sdk via the builder
+3. Then send the **publicKey** and **accountId** to the fan passport SDK via the builder
 
 
 
