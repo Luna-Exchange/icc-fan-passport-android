@@ -11,7 +11,7 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 `implementation 'com.github.Luna-Exchange:icc-fan-passport-android:x.x.x`
 
-where `x.x.x` is the latest version `1.0.3`
+where `x.x.x` is the latest version `1.0.5`
 
 2. In settings.gradle
 
@@ -105,6 +105,13 @@ IccFanPassportActivity.Builder(this)
 ```
 5. Wallet created.
 
+
+PS:
+To get the **publicKey** and **accountId** via deep linking, intents will be used via the activity that receives the deep linking, and then you can send the public key to the fan passport SDK.
+
+``` 
+
+```
 
 
 
