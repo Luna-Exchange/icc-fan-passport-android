@@ -51,5 +51,5 @@ data class User(val authToken: String, val name: String, val email: String) :
     Parcelable
 
 @Parcelize
-data class ActivityParam(val user: User, val path : String) :
+data class ActivityParam(val user: User, val path : String, val publicKey : String, val accountId : String) :
     Parcelable
