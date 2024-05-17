@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
 
 ```
 
-3. Then send the **publicKey** and **accountId** to the fan passport.
+3. Then send the **publicKey** and **accountId** to the fan passport sdk via the builder
 
 
 
