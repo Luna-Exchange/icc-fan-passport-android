@@ -11,7 +11,7 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 `implementation 'com.github.Luna-Exchange:icc-fan-passport-android:x.x.x`
 
-where `x.x.x` is the latest version `1.0.5`
+where `x.x.x` is the latest version `1.0.6`
 
 2. In settings.gradle
 
@@ -53,7 +53,7 @@ IccFanPassportActivity.Builder(this)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 ```
-Where accessToken, email, onNavigateBack(), name are passed from the ICC app and entryPoint takes an enum;
+Where accessToken(required), email(required), name (required), and onNavigateBack() are passed from the ICC app, and entryPoint takes an enum;
 
 **DEFAULT** -> default web URL
 
@@ -67,52 +67,15 @@ Where accessToken, email, onNavigateBack(), name are passed from the ICC app and
 
 **REWARDS**  -> Rewards page
 
-onNavigateBack() >> Where you want to navigate to after the SDK has been closed on when Back to ICC is pressed on the web
+onNavigateBack() >> Where you want to navigate to after the SDK has been closed when Back to ICC is pressed on the web
 
 **Wallet Creation Flow**
 
-To create a wallet on a fan passport, the deep link needs to be set to add **accountId** and **publicKey** to the builder method to complete the wallet creation flow.
-1. Add this to the manifest under the activity that will resolve the deep link
+To create a wallet on a fan passport, click Create Wallet in the fan passport module, and an in-app browser is launched. After creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the build method with the **publicKey** and **accountId** as shown below the deep link must be implemented to add **accountId** and **publicKey** to the builder method to complete the wallet creation flow.
 
-```
-               <data android:scheme="iccdev" />
-                <data android:host="mintbase.xyz" />
-
-``` 
-
-2. open SDK using the initialization method as shown below
-```
-
-IccFanPassportActivity.Builder(this)
-            .accessToken("")
-            .email("")
-            .name("")
-            .entryPoint(EntryPoint.DEFAULT)
-	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
-            .build()
-```
-
-3. click on Create Wallet in the fan passport module, and an in-app browser is launched.
+1. Add this to the manifest under the activity that will resolve the deep link; `MainActivity` in this case.
+2. Click on Create Wallet in the fan passport module, and an in-app browser is launched.
 4. after creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the initialization method with the **publicKey** and **accountId** as shown below.
-
-``` 
-IccFanPassportActivity.Builder(this)
-            .accessToken("")
-            .email("")
-            .name("")
-            .entryPoint(EntryPoint.DEFAULT)
-            .accountId(accountId)
-            .publicKey(publicKey)
-	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
-            .build()
-```
-5. Wallet created.
-
-
-PS:
-To get the **publicKey** and **accountId** via deep linking, intents will be used via the activity that receives the deep linking, and then you can send the public key to the fan passport SDK.
-
-1. In the Manifest.
 
 ```
   <activity
@@ -122,13 +85,12 @@ To get the **publicKey** and **accountId** via deep linking, intents will be use
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="iccdev" />
+                <data android:scheme="icc" />
                 <data android:host="mintbase.xyz" />
             </intent-filter>
         </activity>
 ```
-
-2. In the activity.
+2. In the receiving activity, retrieve the **accountId** and **publicKey**, 3. Then, the builder sends the **publicKey** and **accountId** to the fan passport SDK.
 
 ``` 
 
@@ -146,12 +108,20 @@ class MainActivity : AppCompatActivity() {
         val accountId = data?.getQueryParameter("account_id") ?: ""
         val publicKey = data?.getQueryParameter("public_key") ?: ""
 
+	IccFanPassportActivity.Builder(this)
+            .accessToken("")
+            .email("")
+            .name("")
+            .entryPoint(EntryPoint.DEFAULT)
+            .accountId(accountId)
+            .publicKey(publicKey)
+	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
+            .build()
 	}
-	}
+
+}
 
 ```
+PS:  **accountId** and **publicKey** are optional.
 
-3. Then send the **publicKey** and **accountId** to the fan passport SDK via the builder
-
-
-
+5. Wallet created.
