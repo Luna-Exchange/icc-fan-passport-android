@@ -66,7 +66,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
             }
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (url.contains(MINT_BASE_HOST) && url.contains(CONNECT_WALLET)) {
+                if (url.contains(MINT_BASE_HOST)) {
                     launchInAppBrowser("${config.mintBaseUrl}/connect?success_url=${config.scheme}://mintbase.xyz")
                 }
                 return true

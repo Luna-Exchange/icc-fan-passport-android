@@ -6,7 +6,7 @@ class EnvConfig(private val environment: Environment = Environment.DEVELOPMENT) 
         get() = if (environment == Environment.DEVELOPMENT) "https://icc-fan-passport-staging.vercel.app" else "https://fanpassport.icc-cricket.com"
 
     val iccApi : String
-        get() = if (environment == Environment.DEVELOPMENT) "https://icc-fan-passport-stg-api.insomnialabs.xyz" else "https://fanpassport-api.icc-cricket.com"
+        get() = if (environment == Environment.DEVELOPMENT) "https://icc-fan-passport-stg-api.insomnialabs.xyz" else "https://passport-api.icc-cricket.com"
 
     val mintBaseUrl : String
         get() = if (environment == Environment.DEVELOPMENT) "https://testnet.wallet.mintbase.xyz" else "https://wallet.mintbase.xyz/?theme=icc"
