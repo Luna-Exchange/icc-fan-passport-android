@@ -50,10 +50,11 @@ IccFanPassportActivity.Builder(this)
             .email("")
             .name("")
             .entryPoint(EntryPoint.DEFAULT)
+            .environment(Environment.PRODUCTION)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 ```
-Where accessToken(required), email(required), name (required), and onNavigateBack() are passed from the ICC app, and entryPoint takes an enum;
+Where accessToken(required), email(required), name (required), and onNavigateBack() are passed from the ICC app, and entryPoint and environment takes an enum;
 
 **DEFAULT** -> default web URL
 
@@ -115,6 +116,7 @@ class MainActivity : AppCompatActivity() {
             .entryPoint(EntryPoint.DEFAULT)
             .accountId(accountId)
             .publicKey(publicKey)
+            .environment(Environment.PRODUCTION)
 	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
             .build()
 	}
