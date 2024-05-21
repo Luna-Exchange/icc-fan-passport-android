@@ -21,10 +21,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 const val PARAM_EXTRA = "USER_DETAILS"
 const val MINT_BASE_HOST = "mintbase"
+const val CONNECT_WALLET = "connect"
+const val SIGN_TRANSACTION = "sign-transaction"
+
 
 class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
 
@@ -33,6 +37,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
     private lateinit var background: ConstraintLayout
     private var arguments: ActivityParam? = null
     private val viewModel: FanPassportViewModel by viewModels()
+    private lateinit var config: EnvConfig
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +46,8 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         webView = findViewById(R.id.web_view)
         progressBar = findViewById(R.id.progress_bar)
         background = findViewById(R.id.constraint_layout)
+        arguments = intent.getParcelableExtra(PARAM_EXTRA)
+        config = EnvConfig(arguments?.environment ?: Environment.DEVELOPMENT)
         encodeUser()
         observeViewModel()
         val webSettings = webView.settings
@@ -58,8 +65,8 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
             }
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (url.contains(MINT_BASE_HOST)) {
-                    launchInAppBrowser("https://mintbase-wallet-git-icc-theme-mintbase.vercel.app/?theme=icc?success_url=icc://mintbase.xyz")
+                if (url.contains(MINT_BASE_HOST) && url.contains(CONNECT_WALLET)) {
+                    launchInAppBrowser("${config.mintBaseUrl}/connect?success_url=${config.scheme}://mintbase.xyz")
                 }
                 return true
             }
@@ -99,14 +106,13 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
 
     private fun encodeUser() {
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
-        viewModel.encodeUser(arguments?.user)
+        viewModel.encodeUser(arguments?.user, config.iccApi)
     }
 
-    private fun isDeepLinkFromWallet(token : String): String {
-        var url = ""
-            url =
-                "https://passport.icc-cricket.com${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
-        Log.e( "APP","url is $url")
+    private fun isDeepLinkFromWallet(token: String): String {
+        var url =
+            "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
+        Log.e("APP", "url is $url")
         return url
     }
 
@@ -118,8 +124,9 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                     if (!arguments?.accountId.isNullOrEmpty()) {
                         isDeepLinkFromWallet(result.token)
                     } else {
-                        "https://passport.icc-cricket.com${arguments?.path}?passport_access=${result.token}"
+                        "${config.iccUi}${EntryPoint.ONBOARDING.path}/claim-tier?passport_access=${result.token}"
                     }
+                Log.e("TAG","URL IN LOAD URL $url")
                 loadUrlWithWebView(url)
             }
 
@@ -132,6 +139,14 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
             }
         }
     }
+
+    private fun String.replaceCallbackUrl(newCallbackUrl: String): String {
+        val regex = Regex("(callback_url=)[^&]*")
+        val encodedNewCallbackUrl = Uri.encode(newCallbackUrl)
+        return this.replace(regex, "callback_url=$encodedNewCallbackUrl")
+    }
+
+
 
     private fun loadUrlWithWebView(url: String) {
         webView.loadUrl(url)
@@ -152,6 +167,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         private var publicKey: String = ""
         private var accountId: String = ""
         private var entryPoint: String = EntryPoint.DEFAULT.path
+        private var environment: Environment = Environment.DEVELOPMENT
         private lateinit var onNavigateBack: () -> Unit
 
         private val resultLauncher = activity.registerForActivityResult(
@@ -163,6 +179,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         fun email(email: String) = apply { this.email = email }
         fun publicKey(email: String) = apply { this.publicKey = email }
         fun accountId(email: String) = apply { this.accountId = email }
+        fun environment(environment: Environment) = apply { this.environment = environment }
         fun entryPoint(entryPoint: String) = apply { this.entryPoint = entryPoint }
 
         fun onNavigateBack(onNavigateBack: () -> Unit) =
@@ -172,7 +189,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         fun build() {
             val intent = Intent(activity, IccFanPassportActivity::class.java)
             val user = User(authToken = accessToken, name = name, email = email)
-            val param = ActivityParam(user, entryPoint, publicKey, accountId)
+            val param = ActivityParam(user, entryPoint, publicKey, accountId, environment)
             intent.putExtra(PARAM_EXTRA, param)
             resultLauncher.launch(intent)
         }
