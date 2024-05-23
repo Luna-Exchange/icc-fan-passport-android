@@ -26,7 +26,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
                 <data android:host="wallet.mintbase.xyz" />
-                <data android:scheme="fanpassport" />
+                <data android:scheme="iccdev" />
                 <data android:host="mintbase.xyz" />
             </intent-filter>
         </activity>

@@ -45,7 +45,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'io.insomnialabs'
                 artifactId = 'fanpassport'
-                version = '1.0.6'
+                version = '1.0.8'
             }
         }
     }

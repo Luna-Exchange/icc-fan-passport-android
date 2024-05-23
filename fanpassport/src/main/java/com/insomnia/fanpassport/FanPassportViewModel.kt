@@ -19,11 +19,11 @@ class FanPassportViewModel : ViewModel() {
     val token : SharedFlow<Result>
         get() = mToken
 
-    fun encodeUser(user: User?) {
+    fun encodeUser(user: User?, baseUrl : String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 if (user == null) return@launch
-                val service = FanPassportApiClient.create()
+                val service = FanPassportApiClient.create(baseUrl)
                 val tokenFlow = flow {
                     emit(service.encode(user))
                 }
@@ -51,5 +51,5 @@ data class User(val authToken: String, val name: String, val email: String) :
     Parcelable
 
 @Parcelize
-data class ActivityParam(val user: User, val path : String, val publicKey : String, val accountId : String) :
+data class ActivityParam(val user: User, val path : String, val publicKey : String, val accountId : String, val environment: Environment) :
     Parcelable

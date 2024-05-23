@@ -18,23 +18,23 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 const val PARAM_EXTRA = "USER_DETAILS"
 const val MINT_BASE_HOST = "mintbase"
 
-class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
+class IccFanPassportActivity() : AppCompatActivity(),
+    OnJavScriptInterface {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
     private lateinit var background: ConstraintLayout
     private var arguments: ActivityParam? = null
     private val viewModel: FanPassportViewModel by viewModels()
+    private lateinit var config: EnvConfig
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +43,9 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         webView = findViewById(R.id.web_view)
         progressBar = findViewById(R.id.progress_bar)
         background = findViewById(R.id.constraint_layout)
-        encodeUser()
-        observeViewModel()
+        arguments = intent.getParcelableExtra(PARAM_EXTRA)
+        config = EnvConfig(arguments?.environment ?: Environment.DEVELOPMENT)
+        openFanPassport()
         val webSettings = webView.settings
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.javaScriptEnabled = true
@@ -61,7 +62,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 if (url.contains(MINT_BASE_HOST)) {
-                    launchInAppBrowser("https://mintbase-wallet-git-icc-theme-mintbase.vercel.app/?theme=icc?success_url=icc://mintbase.xyz")
+                    launchInAppBrowser("${config.mintBaseUrl}/connect?success_url=${config.scheme}://mintbase.xyz")
                 }
                 return true
             }
@@ -76,6 +77,18 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                             " Android.receiveEvent(JSON.stringify(event));});" +
                             "})()"
                 )
+                loadUrlWithWebView(
+                    "javascript:(function() {" +
+                            "window.parent.addEventListener ('sign-in-with-icc', function(event) {" +
+                            " Android.receiveSignInEvent(JSON.stringify(event));});" +
+                            "})()"
+                )
+                loadUrlWithWebView(
+                    "javascript:(function() {" +
+                            "window.parent.addEventListener ('go-to-fantasy', function(event) {" +
+                            " Android.receiveFantasyEvent(JSON.stringify(event));});" +
+                            "})()"
+                )
             }
         }
 
@@ -85,9 +98,19 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                     "WebView", consoleMessage?.message() + " -- From line "
                             + consoleMessage?.lineNumber() + " of "
                             + consoleMessage?.sourceId()
-                );
+                )
                 return super.onConsoleMessage(consoleMessage)
             }
+        }
+    }
+
+    private fun openFanPassport() {
+        if (arguments?.user?.authToken.isNullOrEmpty()) {
+            val url = config.iccUi
+            loadUrlWithWebView(url)
+        } else {
+            encodeUser()
+            observeViewModel()
         }
     }
 
@@ -101,14 +124,13 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
 
     private fun encodeUser() {
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
-        viewModel.encodeUser(arguments?.user)
+        viewModel.encodeUser(arguments?.user, config.iccApi)
     }
 
-    private fun isDeepLinkFromWallet(token : String): String {
-        var url = ""
-            url =
-                "https://passport.icc-cricket.com${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
-        Log.e( "APP","url is $url")
+    private fun isDeepLinkFromWallet(token: String): String {
+        var url =
+            "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
+        Log.e("APP", "url is $url")
         return url
     }
 
@@ -120,18 +142,12 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                     if (!arguments?.accountId.isNullOrEmpty()) {
                         isDeepLinkFromWallet(result.token)
                     } else {
-                        "https://passport.icc-cricket.com${arguments?.path}?passport_access=${result.token}"
+                        "${config.iccUi}${EntryPoint.ONBOARDING.path}/claim-tier?passport_access=${result.token}"
                     }
                 loadUrlWithWebView(url)
             }
 
-            is Result.Failed -> {
-                Toast.makeText(
-                    this,
-                    "Could not complete Auth Flow ${result.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            is Result.Failed -> {}
         }
     }
 
@@ -147,13 +163,35 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         customTabsIntent.launchUrl(this, Uri.parse(url))
     }
 
-    class Builder(private val activity: ComponentActivity) {
+
+    override fun onNavigateBack() {
+        finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (arguments?.user != null) {
+            encodeUser()
+            observeViewModel()
+        }
+    }
+
+    override fun onDeepLinkToFantasy() {
+        Toast.makeText(this, "Fantasy", Toast.LENGTH_SHORT).show()
+        val deepLinkUri = Uri.parse(config.fantasyScheme)
+        val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
+        startActivity(intent)
+    }
+
+
+     class Builder(private val activity: ComponentActivity) {
         private var accessToken: String = ""
         private var name: String = ""
         private var email: String = ""
         private var publicKey: String = ""
         private var accountId: String = ""
         private var entryPoint: String = EntryPoint.DEFAULT.path
+        private var environment: Environment = Environment.DEVELOPMENT
         private lateinit var onNavigateBack: () -> Unit
 
         private val resultLauncher = activity.registerForActivityResult(
@@ -165,24 +203,20 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         fun email(email: String) = apply { this.email = email }
         fun publicKey(email: String) = apply { this.publicKey = email }
         fun accountId(email: String) = apply { this.accountId = email }
+        fun environment(environment: Environment) = apply { this.environment = environment }
         fun entryPoint(entryPoint: String) = apply { this.entryPoint = entryPoint }
 
-        fun onNavigateBack(onNavigateBack: () -> Unit) =
-            apply { this.onNavigateBack = onNavigateBack }
+        fun onNavigateBack(onNavigateBack: () -> Unit) = apply { this.onNavigateBack = onNavigateBack }
 
 
         fun build() {
             val intent = Intent(activity, IccFanPassportActivity::class.java)
             val user = User(authToken = accessToken, name = name, email = email)
-            val param = ActivityParam(user, entryPoint, publicKey, accountId)
+            val param = ActivityParam(user, entryPoint, publicKey, accountId, environment)
             intent.putExtra(PARAM_EXTRA, param)
             resultLauncher.launch(intent)
         }
 
-    }
-
-    override fun onNavigateBack() {
-        finish()
     }
 
 }
