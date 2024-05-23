@@ -9,8 +9,25 @@ class WebAppInterface(private val onJavScriptInterface: OnJavScriptInterface) {
         onJavScriptInterface.onNavigateBack()
         return true
     }
+
+    @JavascriptInterface
+    fun receiveSignInEvent(data: String): Boolean {
+        onJavScriptInterface.onAuthenticateWithIcc()
+        return true
+    }
+
+    @JavascriptInterface
+    fun receiveFantasyEvent(data: String): Boolean {
+        onJavScriptInterface.onDeepLinkToFantasy()
+        return true
+    }
 }
 
 interface OnJavScriptInterface{
-    fun onNavigateBack()
+    fun onNavigateBack() {}
+
+    fun onAuthenticateWithIcc() {}
+
+    fun onDeepLinkToFantasy() {}
+
 }

@@ -18,20 +18,16 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 const val PARAM_EXTRA = "USER_DETAILS"
 const val MINT_BASE_HOST = "mintbase"
-const val CONNECT_WALLET = "connect"
-const val SIGN_TRANSACTION = "sign-transaction"
 
-
-class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
+class IccFanPassportActivity() : AppCompatActivity(),
+    OnJavScriptInterface {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
@@ -49,8 +45,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         background = findViewById(R.id.constraint_layout)
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
         config = EnvConfig(arguments?.environment ?: Environment.DEVELOPMENT)
-        encodeUser()
-        observeViewModel()
+        openFanPassport()
         val webSettings = webView.settings
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.javaScriptEnabled = true
@@ -82,6 +77,18 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                             " Android.receiveEvent(JSON.stringify(event));});" +
                             "})()"
                 )
+                loadUrlWithWebView(
+                    "javascript:(function() {" +
+                            "window.parent.addEventListener ('sign-in-with-icc', function(event) {" +
+                            " Android.receiveSignInEvent(JSON.stringify(event));});" +
+                            "})()"
+                )
+                loadUrlWithWebView(
+                    "javascript:(function() {" +
+                            "window.parent.addEventListener ('go-to-fantasy', function(event) {" +
+                            " Android.receiveFantasyEvent(JSON.stringify(event));});" +
+                            "})()"
+                )
             }
         }
 
@@ -91,9 +98,19 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                     "WebView", consoleMessage?.message() + " -- From line "
                             + consoleMessage?.lineNumber() + " of "
                             + consoleMessage?.sourceId()
-                );
+                )
                 return super.onConsoleMessage(consoleMessage)
             }
+        }
+    }
+
+    private fun openFanPassport() {
+        if (arguments?.user?.authToken.isNullOrEmpty()) {
+            val url = config.iccUi
+            loadUrlWithWebView(url)
+        } else {
+            encodeUser()
+            observeViewModel()
         }
     }
 
@@ -127,27 +144,12 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
                     } else {
                         "${config.iccUi}${EntryPoint.ONBOARDING.path}/claim-tier?passport_access=${result.token}"
                     }
-                Log.e("TAG","URL IN LOAD URL $url")
                 loadUrlWithWebView(url)
             }
 
-            is Result.Failed -> {
-                Toast.makeText(
-                    this,
-                    "Could not complete Auth Flow ${result.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            is Result.Failed -> {}
         }
     }
-
-    private fun String.replaceCallbackUrl(newCallbackUrl: String): String {
-        val regex = Regex("(callback_url=)[^&]*")
-        val encodedNewCallbackUrl = Uri.encode(newCallbackUrl)
-        return this.replace(regex, "callback_url=$encodedNewCallbackUrl")
-    }
-
-
 
     private fun loadUrlWithWebView(url: String) {
         webView.loadUrl(url)
@@ -161,7 +163,28 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         customTabsIntent.launchUrl(this, Uri.parse(url))
     }
 
-    class Builder(private val activity: ComponentActivity) {
+
+    override fun onNavigateBack() {
+        finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (arguments?.user != null) {
+            encodeUser()
+            observeViewModel()
+        }
+    }
+
+    override fun onDeepLinkToFantasy() {
+        Toast.makeText(this, "Fantasy", Toast.LENGTH_SHORT).show()
+        val deepLinkUri = Uri.parse(config.fantasyScheme)
+        val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
+        startActivity(intent)
+    }
+
+
+     class Builder(private val activity: ComponentActivity) {
         private var accessToken: String = ""
         private var name: String = ""
         private var email: String = ""
@@ -183,8 +206,7 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
         fun environment(environment: Environment) = apply { this.environment = environment }
         fun entryPoint(entryPoint: String) = apply { this.entryPoint = entryPoint }
 
-        fun onNavigateBack(onNavigateBack: () -> Unit) =
-            apply { this.onNavigateBack = onNavigateBack }
+        fun onNavigateBack(onNavigateBack: () -> Unit) = apply { this.onNavigateBack = onNavigateBack }
 
 
         fun build() {
@@ -195,10 +217,6 @@ class IccFanPassportActivity : AppCompatActivity(), OnJavScriptInterface {
             resultLauncher.launch(intent)
         }
 
-    }
-
-    override fun onNavigateBack() {
-        finish()
     }
 
 }
