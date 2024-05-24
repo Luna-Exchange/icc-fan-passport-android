@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 const val PARAM_EXTRA = "USER_DETAILS"
 const val MINT_BASE_HOST = "mintbase"
 
-class IccFanPassportActivity() : AppCompatActivity(),
+class IccFanPassportActivity : AppCompatActivity(),
     OnJavScriptInterface {
 
     private lateinit var webView: WebView
@@ -172,7 +172,7 @@ class IccFanPassportActivity() : AppCompatActivity(),
     }
 
     override fun onAuthenticateWithIcc() {
-        Toast.makeText(this, "Sign In With Icc", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     override fun onResume() {
