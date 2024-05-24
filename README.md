@@ -1,5 +1,10 @@
 An Android SDK that provides a simple way to launch a web view in android applications.
 
+Contents
+1. Steps to Install
+2. Wallet Creation Flow
+3. Authentication Flow
+
 
 1. Add the dependency to your build.gradle.
 
@@ -11,7 +16,7 @@ An Android SDK that provides a simple way to launch a web view in android applic
 
 `implementation 'com.github.Luna-Exchange:icc-fan-passport-android:x.x.x`
 
-where `x.x.x` is the latest version `1.0.6`
+where `x.x.x` is the latest version `1.0.8`
 
 2. In settings.gradle
 
@@ -69,6 +74,7 @@ Where accessToken(required), email(required), name (required), and onNavigateBac
 **REWARDS**  -> Rewards page
 
 onNavigateBack() >> Where you want to navigate to after the SDK has been closed when Back to ICC is pressed on the web
+
 
 **Wallet Creation Flow**
 
