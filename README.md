@@ -127,3 +127,13 @@ class MainActivity : AppCompatActivity() {
 PS:  **accountId** and **publicKey** are optional.
 
 5. Wallet created.
+
+
+
+**Authentication Flow**
+
+This flow caters to users who use fan passports without getting authenticated via the ICC app.
+1. When sign-in is clicked on the WebView.
+2. onNavigateBack is invoked, which closes the SDK.
+3. Relaunches the **SDK** with **token**, **email** and **name** as shown above to authenticate user.
+
