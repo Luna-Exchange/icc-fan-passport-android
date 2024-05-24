@@ -61,7 +61,9 @@ class IccFanPassportActivity : AppCompatActivity(),
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 if (url.contains(MINT_BASE_HOST)) {
-                    launchInAppBrowser("${config.mintBaseUrl}/connect?success_url=${config.scheme}://mintbase.xyz")
+                    val url = "${config.mintBaseUrl}&success_url=${config.scheme}://mintbase.xyz"
+                    Log.e("TAG", "mitbasee ==> $url")
+                    launchInAppBrowser(url)
                 }
                 return true
             }
