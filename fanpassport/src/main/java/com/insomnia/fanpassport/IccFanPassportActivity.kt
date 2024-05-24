@@ -11,7 +11,6 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -145,7 +144,7 @@ class IccFanPassportActivity : AppCompatActivity(),
                     if (!arguments?.accountId.isNullOrEmpty()) {
                         isDeepLinkFromWallet(result.token)
                     } else {
-                        "${config.iccUi}${EntryPoint.ONBOARDING.path}/claim-tier?passport_access=${result.token}"
+                        "${config.iccUi}${arguments?.path}?passport_access=${result.token}"
                     }
                 loadUrlWithWebView(url)
             }
@@ -192,7 +191,8 @@ class IccFanPassportActivity : AppCompatActivity(),
     override fun onDeepLinkToPrediction() {
         val deepLinkUri = Uri.parse(config.predictionUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
-        startActivity(intent)    }
+        startActivity(intent)
+    }
 
 
      class Builder(private val activity: ComponentActivity) {
