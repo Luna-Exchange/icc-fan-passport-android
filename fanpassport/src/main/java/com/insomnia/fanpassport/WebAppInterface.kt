@@ -21,13 +21,21 @@ class WebAppInterface(private val onJavScriptInterface: OnJavScriptInterface) {
         onJavScriptInterface.onDeepLinkToFantasy()
         return true
     }
+
+    @JavascriptInterface
+    fun receivePredictionEvent(data: String) : Boolean {
+        onJavScriptInterface.onDeepLinkToPrediction()
+        return true
+    }
 }
 
 interface OnJavScriptInterface{
     fun onNavigateBack() {}
 
-    fun onAuthenticateWithIcc() {}
+    fun onAuthenticateWithIcc()
 
     fun onDeepLinkToFantasy() {}
+
+    fun onDeepLinkToPrediction() {}
 
 }

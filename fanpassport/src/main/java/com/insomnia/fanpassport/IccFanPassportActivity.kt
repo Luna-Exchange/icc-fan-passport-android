@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 const val PARAM_EXTRA = "USER_DETAILS"
 const val MINT_BASE_HOST = "mintbase"
 
-class IccFanPassportActivity() : AppCompatActivity(),
+class IccFanPassportActivity : AppCompatActivity(),
     OnJavScriptInterface {
 
     private lateinit var webView: WebView
@@ -89,6 +89,12 @@ class IccFanPassportActivity() : AppCompatActivity(),
                             " Android.receiveFantasyEvent(JSON.stringify(event));});" +
                             "})()"
                 )
+                loadUrlWithWebView(
+                    "javascript:(function() {" +
+                            "window.parent.addEventListener ('go-to-prediction', function(event) {" +
+                            " Android.receivePredictionEvent(JSON.stringify(event));});" +
+                            "})()"
+                )
             }
         }
 
@@ -128,10 +134,7 @@ class IccFanPassportActivity() : AppCompatActivity(),
     }
 
     private fun isDeepLinkFromWallet(token: String): String {
-        var url =
-            "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
-        Log.e("APP", "url is $url")
-        return url
+        return "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
     }
 
     private fun loadUrl(result: Result) {
@@ -168,6 +171,10 @@ class IccFanPassportActivity() : AppCompatActivity(),
         finish()
     }
 
+    override fun onAuthenticateWithIcc() {
+        finish()
+    }
+
     override fun onResume() {
         super.onResume()
         if (arguments?.user != null) {
@@ -177,11 +184,15 @@ class IccFanPassportActivity() : AppCompatActivity(),
     }
 
     override fun onDeepLinkToFantasy() {
-        Toast.makeText(this, "Fantasy", Toast.LENGTH_SHORT).show()
-        val deepLinkUri = Uri.parse(config.fantasyScheme)
+        val deepLinkUri = Uri.parse(config.fantasyUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
     }
+
+    override fun onDeepLinkToPrediction() {
+        val deepLinkUri = Uri.parse(config.predictionUri)
+        val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
+        startActivity(intent)    }
 
 
      class Builder(private val activity: ComponentActivity) {
