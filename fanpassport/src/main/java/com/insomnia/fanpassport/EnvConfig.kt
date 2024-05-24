@@ -9,7 +9,7 @@ class EnvConfig(private val environment: Environment = Environment.DEVELOPMENT) 
         get() = if (environment == Environment.DEVELOPMENT) "https://icc-fan-passport-stg-api.insomnialabs.xyz" else "https://passport-api.icc-cricket.com"
 
     val mintBaseUrl : String
-        get() = if (environment == Environment.DEVELOPMENT) "https://testnet.wallet.mintbase.xyz" else "https://wallet.mintbase.xyz/?theme=icc"
+        get() = if (environment == Environment.DEVELOPMENT) "https://testnet.wallet.mintbase.xyz/connect?theme=icc" else "https://wallet.mintbase.xyz/connect?theme=icc"
 
     val scheme : String
         get() = if (environment == Environment.DEVELOPMENT) "iccdev" else "icc"
@@ -23,7 +23,7 @@ class EnvConfig(private val environment: Environment = Environment.DEVELOPMENT) 
 }
 
 
-enum class Environment(val key : String) {
-    DEVELOPMENT("development"),
-    PRODUCTION("production")
+enum class Environment() {
+    DEVELOPMENT,
+    PRODUCTION
 }
