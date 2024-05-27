@@ -1,10 +1,9 @@
-An Android SDK that provides a simple way to launch a web view in android applications.
+An Android SDK that provides a simple way to launch a web view in Android applications.
 
 Contents
 1. Steps to Install
 2. Wallet Creation Flow
 3. Authentication Flow
-
 
 
 Steps to Install
@@ -50,18 +49,58 @@ dependencyResolutionManagement {
 
 3. Sync the project.
 
-4. Start the SDK with
-``` 
-IccFanPassportActivity.Builder(this)
-            .accessToken("")
-            .email("")
-            .name("")
-            .entryPoint(EntryPoint.DEFAULT)
-            .environment(Environment.PRODUCTION)
-	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
-            .build()
+
+**Launch this SDK **
+
+1. When a user is not authenticated.
+
 ```
-Where accessToken(required), email(required), name (required), and onNavigateBack() are passed from the ICC app, and entryPoint and environment takes an enum;
+       IccFanPassportActivity.launch(context = this, onAuthenticate = onAuthenticate)
+```
+
+2. When a user is authenticated.
+
+```
+                IccFanPassportActivity.launch(this, user, null)
+```
+
+**To Create Wallet after Deeplink.**
+
+```
+        IccFanPassportActivity.connectWallet(context = this, publicKey = publicKey, accountId = accountId)
+```
+
+**To Delegate Sign in to ICC after Signin has been clicked on the SDK**
+
+```
+        val onAuthenticate = object : OnAuthenticate {
+            override fun signIn()  {
+                val param = SdkParam(user)
+                IccFanPassportActivity.launch(this@MainActivity, param, null)
+            }
+        }
+
+```
+
+**To Logout**
+
+```
+        IccFanPassportActivity.logOut(this)
+```
+
+
+**SdkParams**
+
+
+This is an object that helps set the SDK. It  accepts optional arguments that include;
+
+1. user of type **User**,
+2. entryPoint of type **String**, which can be gotten from the enum EntryPoint,
+3. public key of type **String** (required for wallet creation),
+4. accountId of type **String** (required for wallet creation),
+5. environment of enum type **Environment**
+
+**EntryPoint**
 
 **DEFAULT** -> default web URL
 
@@ -74,8 +113,6 @@ Where accessToken(required), email(required), name (required), and onNavigateBac
 **CHALLENGES**  -> Challenges page
 
 **REWARDS**  -> Rewards page
-
-onNavigateBack() >> Where you want to navigate to after the SDK has been closed when Back to ICC is pressed on the web
 
 
 **Wallet Creation Flow**
@@ -99,49 +136,29 @@ To create a wallet on a fan passport, click Create Wallet in the fan passport mo
             </intent-filter>
         </activity>
 ```
-2. In the receiving activity, retrieve the **accountId** and **publicKey**, 3. Then, the builder sends the **publicKey** and **accountId** to the fan passport SDK.
-
-``` 
-
-class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val pbText = findViewById<TextView>(R.id.public_key)
-        val aidText = findViewById<TextView>(R.id.account_id)
-
-
-        val intent = intent
-        val data = intent.data
-        val accountId = data?.getQueryParameter("account_id") ?: ""
-        val publicKey = data?.getQueryParameter("public_key") ?: ""
-
-	IccFanPassportActivity.Builder(this)
-            .accessToken("")
-            .email("")
-            .name("")
-            .entryPoint(EntryPoint.DEFAULT)
-            .accountId(accountId)
-            .publicKey(publicKey)
-            .environment(Environment.PRODUCTION)
-	    .onNavigateBack{ //TODO: enter an action you want to take when back is pressed }
-            .build()
-	}
-
-}
+2. In the receiving activity, retrieve the **accountId** and **publicKey**, 3. Then, call this function
 
 ```
-PS:  **accountId** and **publicKey** are optional.
+        IccFanPassportActivity.connectWallet(context = this, publicKey = publicKey, accountId = accountId)
+``` 
 
-5. Wallet created.
-
+3. Wallet created.
 
 
 **Authentication Flow**
 
-This flow caters to users who use fan passports without getting authenticated via the ICC app.
-1. When sign-in is clicked on the WebView.
-2. onNavigateBack is invoked, which closes the SDK.
-3. Relaunches the **SDK** with **token**, **email** and **name** as shown above to authenticate user.
+This flow caters to users who use fan passports without getting authenticated via the ICC app. The expectation is that when calling the Sdk, an interface should be passed as an argument. e.g 
+
+```
+  val onAuthenticate = object : OnAuthenticate {
+            override fun signIn()  {
+		//handles authentication
+                val param = SdkParam(user)
+                IccFanPassportActivity.launch(this@MainActivity, param, null)
+            }
+        }
+```
+
+In this interface, a **signIn()** function handles authentication and then calls the SDK with the user object, as shown above. Therefore, this flow is executed when sign-in is clicked on the WebView, and the user is authenticated on a fan passport.
+
 
