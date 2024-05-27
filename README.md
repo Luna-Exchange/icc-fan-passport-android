@@ -55,19 +55,19 @@ dependencyResolutionManagement {
 1. When a user is not authenticated.
 
 ```
-       IccFanPassportActivity.launch(context = this, onAuthenticate = onAuthenticate)
+     IccFanPassportActivity.launch(context = this, onAuthenticate = onAuthenticate)
 ```
 
 2. When a user is authenticated.
 
 ```
-                IccFanPassportActivity.launch(this, user, null)
+     IccFanPassportActivity.launch(this, user, null)
 ```
 
 **To Create Wallet after Deeplink.**
 
 ```
-        IccFanPassportActivity.connectWallet(context = this, publicKey = publicKey, accountId = accountId)
+     IccFanPassportActivity.connectWallet(context = this, publicKey = publicKey, accountId = accountId)
 ```
 
 **To Delegate Sign in to ICC after Signin has been clicked on the SDK**
@@ -85,7 +85,7 @@ dependencyResolutionManagement {
 **To Logout**
 
 ```
-        IccFanPassportActivity.logOut(this)
+    IccFanPassportActivity.logOut(this)
 ```
 
 
@@ -159,6 +159,13 @@ This flow caters to users who use fan passports without getting authenticated vi
         }
 ```
 
+
 In this interface, a **signIn()** function handles authentication and then calls the SDK with the user object, as shown above. Therefore, this flow is executed when sign-in is clicked on the WebView, and the user is authenticated on a fan passport.
 
+**Log Out**
 
+When log out is clicked on the ICC App, the function below is called, which ensures that the user will be logged out when the fan passport is opened.
+
+```
+    IccFanPassportActivity.logOut(this)
+```
