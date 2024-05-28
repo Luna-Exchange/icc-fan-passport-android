@@ -27,6 +27,12 @@ class WebAppInterface(private val onJavScriptInterface: OnJavScriptInterface) {
         onJavScriptInterface.onDeepLinkToPrediction()
         return true
     }
+
+    @JavascriptInterface
+    fun receiveLogPutEvent(data: String) : Boolean {
+        onJavScriptInterface.onDeepLinkToPrediction()
+        return true
+    }
 }
 
 interface OnJavScriptInterface{
@@ -38,4 +44,5 @@ interface OnJavScriptInterface{
 
     fun onDeepLinkToPrediction() {}
 
+    fun onLogOut()
 }

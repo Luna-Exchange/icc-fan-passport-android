@@ -1,7 +1,7 @@
 package com.insomnia.fanpassport
 
+import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,95 +9,66 @@ import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.ProgressBar
-import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import java.net.URL
 
 
 const val PARAM_EXTRA = "USER_DETAILS"
-const val MINT_BASE_HOST = "mintbase"
+const val MINT_BASE_CREATE_WALLET = "connect"
+const val MINT_BASE_SIGN_TRANSACTION = "sign"
+
 
 class IccFanPassportActivity : AppCompatActivity(),
-    OnJavScriptInterface {
+    OnJavScriptInterface, IccWebViewInterface {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
     private lateinit var background: ConstraintLayout
-    private var arguments: ActivityParam? = null
+    private var arguments: SdkParam? = null
     private val viewModel: FanPassportViewModel by viewModels()
     private lateinit var config: EnvConfig
+    private lateinit var sharedPrefProvider: SharedPrefProvider
+
+    private var shouldRefresh = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_icc_fan_passport)
-        webView = findViewById(R.id.web_view)
+        setupViews()
+        setupConfig()
+        setupWebView()
+        openFanPassport()
+    }
+
+    private fun setupConfig() {
+        sharedPrefProvider = SharedPrefProvider(this)
+        config = EnvConfig(arguments?.environment ?: Environment.DEVELOPMENT)
+    }
+
+    private fun setupViews() {
         progressBar = findViewById(R.id.progress_bar)
         background = findViewById(R.id.constraint_layout)
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
-        config = EnvConfig(arguments?.environment ?: Environment.DEVELOPMENT)
-        openFanPassport()
+    }
+
+    private fun setupWebView() {
+        webView = findViewById(R.id.web_view)
         val webSettings = webView.settings
         webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
-
-        webView.webViewClient = object : WebViewClient() {
-
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                super.onPageStarted(view, url, favicon)
-                progressBar.visibility = View.VISIBLE
-
-            }
-
-            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (url.contains(MINT_BASE_HOST)) {
-                    val url = "${config.mintBaseUrl}&success_url=${config.scheme}://mintbase.xyz"
-                    Log.e("TAG", "mitbasee ==> $url")
-                    launchInAppBrowser(url)
-                }
-                return true
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                webView.visibility = View.VISIBLE
-                progressBar.visibility = View.GONE
-                background.visibility = View.GONE
-                loadUrlWithWebView(
-                    "javascript:(function() {" +
-                            "window.parent.addEventListener ('navigate-to-icc', function(event) {" +
-                            " Android.receiveEvent(JSON.stringify(event));});" +
-                            "})()"
-                )
-                loadUrlWithWebView(
-                    "javascript:(function() {" +
-                            "window.parent.addEventListener ('sign-in-with-icc', function(event) {" +
-                            " Android.receiveSignInEvent(JSON.stringify(event));});" +
-                            "})()"
-                )
-                loadUrlWithWebView(
-                    "javascript:(function() {" +
-                            "window.parent.addEventListener ('go-to-fantasy', function(event) {" +
-                            " Android.receiveFantasyEvent(JSON.stringify(event));});" +
-                            "})()"
-                )
-                loadUrlWithWebView(
-                    "javascript:(function() {" +
-                            "window.parent.addEventListener ('go-to-prediction', function(event) {" +
-                            " Android.receivePredictionEvent(JSON.stringify(event));});" +
-                            "})()"
-                )
-            }
-        }
+        webView.webViewClient = IccWebViewClient(this)
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
@@ -112,54 +83,85 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
     private fun openFanPassport() {
-        if (arguments?.user?.authToken.isNullOrEmpty()) {
+        val token = sharedPrefProvider.getAccessToken()
+        if (token.isEmpty()) {
             val url = config.iccUi
             loadUrlWithWebView(url)
         } else {
-            encodeUser()
+            encodeUser(arguments?.user)
             observeViewModel()
         }
     }
 
     private fun observeViewModel() {
+        if (!shouldRefresh) return
         lifecycleScope.launch {
             viewModel.token
-                .flowWithLifecycle(lifecycle)
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect(::loadUrl)
         }
     }
 
-    private fun encodeUser() {
-        arguments = intent.getParcelableExtra(PARAM_EXTRA)
-        viewModel.encodeUser(arguments?.user, config.iccApi)
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleCreateWalletDeepLink(intent)
     }
 
-    private fun isDeepLinkFromWallet(token: String): String {
-        return "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
+    private fun handleCreateWalletDeepLink(intent: Intent) {
+        shouldRefresh = false
+        val data = intent.data
+        val accountId = data?.getQueryParameter("account_id") ?: ""
+        val publicKey = data?.getQueryParameter("public_key") ?: ""
+        if (accountId.isNotEmpty()) {
+            webView.loadUrl("${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?account_id=$accountId&public_key=${publicKey}")
+        } else {
+            webView.loadUrl("${config.iccUi}${EntryPoint.ONBOARDING.path}/claim-tier")
+        }
+    }
+
+    private fun encodeUser(user: User?) {
+        viewModel.encodeUser(user, config.iccApi)
     }
 
     private fun loadUrl(result: Result) {
-
+        if (!shouldRefresh) return
         when (result) {
             is Result.Success -> {
-                val url =
-                    if (!arguments?.accountId.isNullOrEmpty()) {
-                        isDeepLinkFromWallet(result.token)
-                    } else {
-                        "${config.iccUi}${arguments?.path}?passport_access=${result.token}"
-                    }
-                loadUrlWithWebView(url)
+                sharedPrefProvider.saveAccessToken(result.token)
+                loadUrlBasedOnActions()
             }
 
-            is Result.Failed -> {}
+            is Result.Failed -> {
+                finish()
+            }
+
+            is Result.Default -> {}
         }
+    }
+
+    private fun loadUrlBasedOnActions() {
+        var url = config.iccUi
+        val token = sharedPrefProvider.getAccessToken()
+        when (arguments!!.action) {
+            SdkActions.SIGN_IN -> {
+                url = "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}"
+            }
+
+            SdkActions.CONNECT_WALLET -> {
+                url =
+                    "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
+            }
+
+            else -> {}
+        }
+        loadUrlWithWebView(url)
     }
 
     private fun loadUrlWithWebView(url: String) {
         webView.loadUrl(url)
     }
 
-    fun launchInAppBrowser(url: String) {
+    private fun launchInAppBrowser(url: String) {
         val builder = CustomTabsIntent.Builder()
         builder.setShowTitle(true)
 
@@ -173,63 +175,127 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
     override fun onAuthenticateWithIcc() {
-        finish()
+        onAuthenticate?.signIn()
     }
 
     override fun onResume() {
         super.onResume()
         if (arguments?.user != null) {
-            encodeUser()
+            encodeUser(arguments?.user)
             observeViewModel()
         }
     }
 
+
     override fun onDeepLinkToFantasy() {
+        Toast.makeText(this, "Fantasy", Toast.LENGTH_SHORT).show()
         val deepLinkUri = Uri.parse(config.fantasyUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
     }
 
     override fun onDeepLinkToPrediction() {
+        Toast.makeText(this, "Prediction", Toast.LENGTH_SHORT).show()
         val deepLinkUri = Uri.parse(config.predictionUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
     }
 
+    override fun onLogOut() {
+        finish()
+    }
 
-     class Builder(private val activity: ComponentActivity) {
-        private var accessToken: String = ""
-        private var name: String = ""
-        private var email: String = ""
-        private var publicKey: String = ""
-        private var accountId: String = ""
-        private var entryPoint: String = EntryPoint.DEFAULT.path
-        private var environment: Environment = Environment.DEVELOPMENT
-        private lateinit var onNavigateBack: () -> Unit
+    override fun onPageStarted() {
+        progressBar.visibility = View.VISIBLE
+    }
 
-        private val resultLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { onNavigateBack.invoke() }
+    override fun OnPageFinished() {
 
-        fun accessToken(accessToken: String) = apply { this.accessToken = accessToken }
-        fun name(name: String) = apply { this.name = name }
-        fun email(email: String) = apply { this.email = email }
-        fun publicKey(email: String) = apply { this.publicKey = email }
-        fun accountId(email: String) = apply { this.accountId = email }
-        fun environment(environment: Environment) = apply { this.environment = environment }
-        fun entryPoint(entryPoint: String) = apply { this.entryPoint = entryPoint }
-
-        fun onNavigateBack(onNavigateBack: () -> Unit) = apply { this.onNavigateBack = onNavigateBack }
-
-
-        fun build() {
-            val intent = Intent(activity, IccFanPassportActivity::class.java)
-            val user = User(authToken = accessToken, name = name, email = email)
-            val param = ActivityParam(user, entryPoint, publicKey, accountId, environment)
-            intent.putExtra(PARAM_EXTRA, param)
-            resultLauncher.launch(intent)
-        }
+        webView.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
+        background.visibility = View.GONE
+        loadUrlWithWebView(
+            """
+    javascript:(function() {
+        window.parent.addEventListener('navigate-to-icc', function(event) {
+            Android.receiveEvent(JSON.stringify(event));
+        });
+        window.parent.addEventListener('sign-in-with-icc', function(event) {
+            Android.receiveSignInEvent(JSON.stringify(event));
+        });
+        window.parent.addEventListener('go-to-fantasy', function(event) {
+            Android.receiveFantasyEvent(JSON.stringify(event));
+        });
+        window.parent.addEventListener('go-to-prediction', function(event) {
+            Android.receivePredictionEvent(JSON.stringify(event));
+        });
+        window.parent.addEventListener('fan-passport-sign-out', function(event) {
+            Android.receivePredictionEvent(JSON.stringify(event));
+        });
+    })()
+    """
+        )
 
     }
 
+    override fun shouldOverrideCreateWallet() {
+        val connectBrowserUrl =
+            "${config.mintBaseUrl}&success_url=${config.scheme}://mintbase.xyz"
+        launchInAppBrowser(connectBrowserUrl)
+    }
+
+    override fun shouldOverrideSignTransaction(url: String) {
+        val connectBrowserUrl =
+            "${removeCallbackUrl(url)}&callback_url=${config.scheme}://mintbase.xyz"
+        launchInAppBrowser(connectBrowserUrl)
+    }
+
+
+    companion object {
+        private var onAuthenticate: OnAuthenticate? = null
+
+        fun launch(
+            context: Activity,
+            user: User? = null,
+            entryPoint: String = EntryPoint.ONBOARDING.path,
+            onAuthenticate: OnAuthenticate?
+        ) {
+            val sdkParam = if (user != null) SdkParam(user).copy(
+                action = SdkActions.SIGN_IN,
+                entryPoint = entryPoint
+            ) else SdkParam(entryPoint = entryPoint)
+            val token = sdkParam.user?.authToken.orEmpty()
+            val sharedPrefProvider = SharedPrefProvider(context)
+            sharedPrefProvider.saveAccessToken(token)
+            sharedPrefProvider.saveUser(user)
+            this.onAuthenticate = onAuthenticate
+            val intent = Intent(context, IccFanPassportActivity::class.java)
+            intent.putExtra(PARAM_EXTRA, sdkParam)
+            context.startActivity(intent)
+        }
+
+        fun logOut(context: Activity) {
+            SharedPrefProvider(context).saveAccessToken("")
+        }
+    }
+
+    private fun removeCallbackUrl(originalUrl: String): String {
+        val url = URL(originalUrl)
+        val queryParams = url.query.split("&").toMutableList()
+        val filteredParams = queryParams.filter { !it.startsWith("callback_url=") }
+        val newQuery = filteredParams.joinToString("&")
+        return "${url.protocol}://${url.host}${url.path}?$newQuery"
+    }
+
+}
+
+
+interface OnAuthenticate {
+    fun signIn()
+}
+
+enum class SdkActions {
+    DEFAULT,
+    SIGN_IN,
+    CONNECT_WALLET
 }
