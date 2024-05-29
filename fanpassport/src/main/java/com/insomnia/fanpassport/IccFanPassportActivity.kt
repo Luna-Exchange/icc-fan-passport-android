@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
+import android.webkit.WebStorage
 import android.webkit.WebView
 import android.widget.ProgressBar
 import androidx.activity.viewModels
@@ -36,7 +37,6 @@ class IccFanPassportActivity : AppCompatActivity(),
     private val viewModel: FanPassportViewModel by viewModels()
     private lateinit var config: EnvConfig
     private lateinit var sharedPrefProvider: SharedPrefProvider
-
     private var shouldRefresh = true
 
 
@@ -108,12 +108,19 @@ class IccFanPassportActivity : AppCompatActivity(),
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val action = SharedPrefProvider(this).getState()
-        if (action == SdkActions.WALLET.name) {
-            handleCreateWalletDeepLink(intent)
-        } else {
-            shouldRefresh = true
-            setupAndOpenFanPassport()
+        when (SharedPrefProvider(this).getState()) {
+            SdkActions.WALLET.name -> {
+                handleCreateWalletDeepLink(intent)
+            }
+            SdkActions.LOG_OUT.name -> {
+                clearWebViewCache()
+                shouldRefresh = true
+                setupAndOpenFanPassport()
+            }
+            else -> {
+                shouldRefresh = true
+                setupAndOpenFanPassport()
+            }
         }
     }
 
@@ -154,7 +161,7 @@ class IccFanPassportActivity : AppCompatActivity(),
         val token = sharedPrefProvider.getAccessToken()
         when (arguments!!.action) {
             SdkActions.SIGN_IN -> {
-                url = "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}"
+                url = "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}&icc_client=mobile_app"
             }
 
             SdkActions.LOG_OUT, SdkActions.DEFAULT -> {
@@ -179,9 +186,6 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
 
-    override fun onNavigateBack() {
-        finish()
-    }
 
     override fun onAuthenticateWithIcc() {
         SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
@@ -229,9 +233,13 @@ class IccFanPassportActivity : AppCompatActivity(),
             Android.receiveEvent(JSON.stringify(event));
         });
         window.parent.addEventListener('sign-in-with-icc', function(event) {
+            Android.receiveSignInAlsoEvent(JSON.stringify(event));
+        });
+         window.parent.addEventListener('sign-in-with-icc-also', function(event) {
             Android.receiveSignInEvent(JSON.stringify(event));
         });
         window.parent.addEventListener('go-to-fantasy', function(event) {
+            Android.receiveFantasyEvent(JSON.stringify(event));
             Android.receiveFantasyEvent(JSON.stringify(event));
         });
         window.parent.addEventListener('go-to-prediction', function(event) {
@@ -295,6 +303,7 @@ class IccFanPassportActivity : AppCompatActivity(),
                 saveAccessToken("")
             }
         }
+
     }
 
     private fun removeCallbackUrl(originalUrl: String): String {
@@ -303,6 +312,19 @@ class IccFanPassportActivity : AppCompatActivity(),
         val filteredParams = queryParams.filter { !it.startsWith("callback_url=") }
         val newQuery = filteredParams.joinToString("&")
         return "${url.protocol}://${url.host}${url.path}?$newQuery"
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        onAuthenticate?.onNavigateBack()
+    }
+
+    private fun clearWebViewCache() {
+        webView.clearCache(true);
+        webView.clearFormData()
+        webView.clearHistory()
+        webView.clearSslPreferences()
+        WebStorage.getInstance().deleteAllData()
     }
 
 }
