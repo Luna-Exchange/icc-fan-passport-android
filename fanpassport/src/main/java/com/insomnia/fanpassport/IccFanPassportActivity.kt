@@ -10,7 +10,6 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -146,12 +145,6 @@ class IccFanPassportActivity : AppCompatActivity(),
             SdkActions.SIGN_IN -> {
                 url = "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}"
             }
-
-            SdkActions.CONNECT_WALLET -> {
-                url =
-                    "${config.iccUi}${EntryPoint.ONBOARDING.path}/connect-wallet?passport_access=${token}&account_id=${arguments?.accountId}&public_key=${arguments?.publicKey}"
-            }
-
             else -> {}
         }
         loadUrlWithWebView(url)
@@ -188,14 +181,12 @@ class IccFanPassportActivity : AppCompatActivity(),
 
 
     override fun onDeepLinkToFantasy() {
-        Toast.makeText(this, "Fantasy", Toast.LENGTH_SHORT).show()
         val deepLinkUri = Uri.parse(config.fantasyUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
     }
 
     override fun onDeepLinkToPrediction() {
-        Toast.makeText(this, "Prediction", Toast.LENGTH_SHORT).show()
         val deepLinkUri = Uri.parse(config.predictionUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
@@ -258,12 +249,17 @@ class IccFanPassportActivity : AppCompatActivity(),
             context: Activity,
             user: User? = null,
             entryPoint: String = EntryPoint.ONBOARDING.path,
-            onAuthenticate: OnAuthenticate?
+            environment: Environment = Environment.DEVELOPMENT,
+            onAuthenticate: OnAuthenticate? = null
         ) {
             val sdkParam = if (user != null) SdkParam(user).copy(
                 action = SdkActions.SIGN_IN,
-                entryPoint = entryPoint
-            ) else SdkParam(entryPoint = entryPoint)
+                entryPoint = entryPoint,
+                environment = environment
+            ) else SdkParam(
+                entryPoint = entryPoint,
+                environment = environment
+            )
             val token = sdkParam.user?.authToken.orEmpty()
             val sharedPrefProvider = SharedPrefProvider(context)
             sharedPrefProvider.saveAccessToken(token)
@@ -273,6 +269,7 @@ class IccFanPassportActivity : AppCompatActivity(),
             intent.putExtra(PARAM_EXTRA, sdkParam)
             context.startActivity(intent)
         }
+
 
         fun logOut(context: Activity) {
             SharedPrefProvider(context).saveAccessToken("")
@@ -296,6 +293,5 @@ interface OnAuthenticate {
 
 enum class SdkActions {
     DEFAULT,
-    SIGN_IN,
-    CONNECT_WALLET
+    SIGN_IN
 }

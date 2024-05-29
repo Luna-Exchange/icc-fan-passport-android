@@ -54,4 +54,4 @@ sealed class Result {
 data class User(val authToken: String, val name: String, val email: String) : Parcelable
 
 @Parcelize
-data class SdkParam(var user: User? = null, var entryPoint : String = "", var publicKey : String= "", var accountId : String = "", var environment: Environment = Environment.DEVELOPMENT, var action : SdkActions = SdkActions.DEFAULT) : Parcelable
+data class SdkParam(var user: User? = null, var entryPoint : String = "", var environment: Environment = Environment.DEVELOPMENT, var action : SdkActions = SdkActions.DEFAULT) : Parcelable
