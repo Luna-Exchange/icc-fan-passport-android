@@ -62,8 +62,6 @@ class IccFanPassportActivity : AppCompatActivity(),
         progressBar = findViewById(R.id.progress_bar)
         background = findViewById(R.id.constraint_layout)
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
-        val arg = arguments?.user
-        val userr = arg
     }
 
     private fun setupWebView() {
@@ -113,7 +111,7 @@ class IccFanPassportActivity : AppCompatActivity(),
         val action = SharedPrefProvider(this).getState()
         if (action == SdkActions.WALLET.name) {
             handleCreateWalletDeepLink(intent)
-        } else if (action == SdkActions.SIGN_IN.name) {
+        } else {
             shouldRefresh = true
             setupAndOpenFanPassport()
         }
