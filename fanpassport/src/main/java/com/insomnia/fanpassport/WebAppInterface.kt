@@ -36,7 +36,7 @@ class WebAppInterface(private val onJavScriptInterface: OnJavScriptInterface) {
 }
 
 interface OnJavScriptInterface{
-    fun onNavigateBack() {}
+    fun onNavigateBack()
 
     fun onAuthenticateWithIcc()
 

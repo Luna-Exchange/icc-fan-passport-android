@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val user = User(
-            authToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imlia2V5MTIzNDUiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJkYjUyMjM0YS0wM2RhLTRiZTUtYjRjNy1hMTVlNDliY2EwMDUiLCJwcm9maWxlX2lkIjoiZGI1MjIzNGEtMDNkYS00YmU1LWI0YzctYTE1ZTQ5YmNhMDA1IiwiaWRwX3N1YiI6ImViMjljNjU2LTVmMTYtNGEyOS04ZGJiLTI3NjFlNjI4ZDZhMiIsInRlbmFudF9pZCI6ImljY2RldiIsImp0aSI6IjkxNGY2M2ZlLTlmZmQtNDQwNC05NDg2LTMyM2I3OTIzZjRkMiIsInNpZCI6IjkxNGY2M2ZlLTlmZmQtNDQwNC05NDg2LTMyM2I3OTIzZjRkMiIsImRldmljZV9pZCI6IjdlN2Y5YjFjLWJjMDQtNGM3YS04MjQ3LTEwMDgyNTMyMzc1YSIsImRldmljZV90eXBlIjoid2ViX2Jyb3dzZXIiLCJyb2xlIjoidXNlciIsInNjb3BlIjoiY2F0YWxvZ3VlLnJlYWQiLCJ0eXAiOiJhY2Nlc3MiLCJhenAiOiI3ZDE4Y2I2Ni01YmFmLTQ5NzktODVjMy05YTZjYzM3ZTYyMmUiLCJpZHBfYmFnIjp7InByb3ZpZGVyIjoiQURCMkMiLCJ0ZnAiOiJCMkNfMUFfU0lHTklOU0lHTlVQIn0sImF1ZCI6ImRldi1zY2FsZS1mcmFua2Z1cnQtYXdzIiwiZXhwIjoxNzE3MDEyMzQwLCJpc3MiOiJodHRwczovL2RlbHRhdHJlLmNvbS9pc3N1ZXIiLCJpYXQiOjE3MTcwMTA1NDAsIm5iZiI6MTcxNzAxMDU0MH0.DMKo6755FnUZ46lvd3sSGVlf0TMMX94e1dSI2wfk_kz9Z_72mvEiXm7Rk5n4J-AiFoYpTop7t4S_WJHnH19rQhHFcQDOAaO9Z7WIfaaOGcDX8n2d7p0vPqDhzcv9GMwB1-VKQxJPBGhyaDBviB29TqEhWpSuYWX88yv-OuBeVXmUrt-C_B8FRZTN1eli5OPCpTadPjTBaQzAP36cKEr1NPcIkH8AUrzLwN6YfXN4mIaRKKjRjEIfQNwxO1bXZ4X1v76m-nXP6jVtHasZAjIQzgH1XfgjFgS-n3AE2t3e7RwBmAIYnWUJ6sbZpMp8wpwGQVPgnZp-gUuFGYGSjQltbA",
-            name = "Iyanu falaye",
-            email = "falaycornelius+07@gmail.com"
+            authToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imlia2V5MTIzNDUiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiI4MTYyMmQ5Yi05ZjdkLTQxMzMtYjMxYi1mYTI1M2EyYTUwYjUiLCJwcm9maWxlX2lkIjoiODE2MjJkOWItOWY3ZC00MTMzLWIzMWItZmEyNTNhMmE1MGI1IiwiaWRwX3N1YiI6IjhiZDIxMDE4LTE1OGUtNDQyOC1hZDI5LTJlYjRiZjZhODFkNiIsInRlbmFudF9pZCI6ImljY2RldiIsImp0aSI6IjU2Njg5NGUzLTZmOWEtNGJmYy1hMzdlLWFmY2NkNDY5OGJkMiIsInNpZCI6IjU2Njg5NGUzLTZmOWEtNGJmYy1hMzdlLWFmY2NkNDY5OGJkMiIsImRldmljZV9pZCI6IjZmNmQyZWFkLTFkMmMtNDdhMS1hMmM2LTFkZTgxZmI0YzQxZSIsImRldmljZV90eXBlIjoid2ViX2Jyb3dzZXIiLCJyb2xlIjoidXNlciIsInNjb3BlIjoiY2F0YWxvZ3VlLnJlYWQiLCJ0eXAiOiJhY2Nlc3MiLCJhenAiOiI3ZDE4Y2I2Ni01YmFmLTQ5NzktODVjMy05YTZjYzM3ZTYyMmUiLCJpZHBfYmFnIjp7InByb3ZpZGVyIjoiQURCMkMiLCJ0ZnAiOiJCMkNfMUFfU0lHTklOU0lHTlVQIn0sImF1ZCI6ImRldi1zY2FsZS1mcmFua2Z1cnQtYXdzIiwiZXhwIjoxNzE3MDI4NDE3LCJpc3MiOiJodHRwczovL2RlbHRhdHJlLmNvbS9pc3N1ZXIiLCJpYXQiOjE3MTcwMjY2MTcsIm5iZiI6MTcxNzAyNjYxN30.mx4ZeIMv-OqC5CzUPUPZ4S7zuX-_ss8i5N4qFsDl6eXTXwPaPEohe_PiBEAm5kdkLzYeIYSWZFPeyF8HwFVwchxG-36dM_U_6x0TV-Z7srrqUZWSm8OP84gE4v2E8m1IqrsvuLvslWyuguXcI2tveL2y6RHbHvsiAwtuUGLjmX3ec_tY07tH8PxqzS5ekS1q7SEmAY_eeln7lyM-vyvr6Y2NnzcBgsd92PE5smnX_a3F7me-wcHTqVUxhQHCV7O-8Bgi08eXnZXBDjFBRv1tvdkWYO2c_n288RC78vVBC6GhntWBYGfZNu4pUlTuAmdpIze0RxGsXT6Si_u_sOCqdQ",
+            name = "Iyanu Falaye",
+            email = "iyanuoluwa+01@insomnialabs.io"
         )
 
         val onAuthenticate = object : OnAuthenticate {
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        IccFanPassportActivity.launch(context = this, user, onAuthenticate = onAuthenticate, entryPoint = EntryPoint.DEFAULT.path)
+        IccFanPassportActivity.launch(context = this,  user = user,  onAuthenticate = onAuthenticate, entryPoint = EntryPoint.DEFAULT.path)
 
 
 

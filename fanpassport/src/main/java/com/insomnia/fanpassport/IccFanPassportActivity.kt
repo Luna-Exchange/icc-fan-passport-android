@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
@@ -38,6 +37,7 @@ class IccFanPassportActivity : AppCompatActivity(),
     private lateinit var config: EnvConfig
     private lateinit var sharedPrefProvider: SharedPrefProvider
     private var shouldRefresh = true
+    private var signInMap = HashMap<String, Int>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,11 +75,6 @@ class IccFanPassportActivity : AppCompatActivity(),
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                Log.d(
-                    "WebView", consoleMessage?.message() + " -- From line "
-                            + consoleMessage?.lineNumber() + " of "
-                            + consoleMessage?.sourceId()
-                )
                 return super.onConsoleMessage(consoleMessage)
             }
         }
@@ -185,11 +180,18 @@ class IccFanPassportActivity : AppCompatActivity(),
         customTabsIntent.launchUrl(this, Uri.parse(url))
     }
 
+    override fun onNavigateBack() {
+        finish()
+    }
 
 
     override fun onAuthenticateWithIcc() {
-        SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
-        onAuthenticate?.signIn()
+        val value = signInMap[SdkActions.SIGN_IN.name] ?: 0
+        if (value < 1) {
+            signInMap[SdkActions.SIGN_IN.name] = value + 1
+            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+            onAuthenticate?.signIn()
+        }
     }
 
     override fun onResume() {
@@ -233,13 +235,9 @@ class IccFanPassportActivity : AppCompatActivity(),
             Android.receiveEvent(JSON.stringify(event));
         });
         window.parent.addEventListener('sign-in-with-icc', function(event) {
-            Android.receiveSignInAlsoEvent(JSON.stringify(event));
-        });
-         window.parent.addEventListener('sign-in-with-icc-also', function(event) {
             Android.receiveSignInEvent(JSON.stringify(event));
         });
         window.parent.addEventListener('go-to-fantasy', function(event) {
-            Android.receiveFantasyEvent(JSON.stringify(event));
             Android.receiveFantasyEvent(JSON.stringify(event));
         });
         window.parent.addEventListener('go-to-prediction', function(event) {
@@ -251,7 +249,6 @@ class IccFanPassportActivity : AppCompatActivity(),
     })()
     """
         )
-
     }
 
     override fun shouldOverrideCreateWallet() {
