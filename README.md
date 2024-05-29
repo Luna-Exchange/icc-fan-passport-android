@@ -108,11 +108,9 @@ This is a function that helps launch the SDK. It  accepts optional arguments tha
 
 **REWARDS**  -> Rewards page
 
+
 **Environment**
-
-**DEVELOPMENT** 
-
-**PRODUCTION**  
+DEVELOPMENT, PRODUCTION  
 
 
 **Wallet Creation Flow**
