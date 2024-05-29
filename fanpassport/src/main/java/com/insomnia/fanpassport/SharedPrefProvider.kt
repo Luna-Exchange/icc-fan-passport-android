@@ -28,13 +28,12 @@ class SharedPrefProvider(private val context: Context) {
         return readString(TOKEN, "") ?: ""
     }
 
-    fun saveUser(user: User?) {
-        saveString(USER, gson.toJson(user))
+    fun saveState(action: SdkActions) {
+        saveString(STATE, action.name)
     }
 
-    fun getUser(): User? {
-        val userString = readString(USER, "")
-        return gson.fromJson(userString, User::class.java)
+    fun getState(): String? {
+        return readString(STATE, SdkActions.DEFAULT.name)
     }
 
 
@@ -43,7 +42,7 @@ class SharedPrefProvider(private val context: Context) {
     companion object {
         const val PREFERENCES_FILE = "pref_file"
         const val TOKEN = "access_token"
-        const val USER = "user_storage"
+        const val STATE = "state_action"
 
 
 

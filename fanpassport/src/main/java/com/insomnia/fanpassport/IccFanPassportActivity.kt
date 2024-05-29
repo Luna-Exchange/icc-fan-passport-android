@@ -43,6 +43,10 @@ class IccFanPassportActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_icc_fan_passport)
+        setupAndOpenFanPassport()
+    }
+
+    private fun setupAndOpenFanPassport() {
         setupViews()
         setupConfig()
         setupWebView()
@@ -58,6 +62,8 @@ class IccFanPassportActivity : AppCompatActivity(),
         progressBar = findViewById(R.id.progress_bar)
         background = findViewById(R.id.constraint_layout)
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
+        val arg = arguments?.user
+        val userr = arg
     }
 
     private fun setupWebView() {
@@ -103,7 +109,14 @@ class IccFanPassportActivity : AppCompatActivity(),
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleCreateWalletDeepLink(intent)
+        setIntent(intent)
+        val action = SharedPrefProvider(this).getState()
+        if (action == SdkActions.WALLET.name) {
+            handleCreateWalletDeepLink(intent)
+        } else if (action == SdkActions.SIGN_IN.name) {
+            shouldRefresh = true
+            setupAndOpenFanPassport()
+        }
     }
 
     private fun handleCreateWalletDeepLink(intent: Intent) {
@@ -145,6 +158,11 @@ class IccFanPassportActivity : AppCompatActivity(),
             SdkActions.SIGN_IN -> {
                 url = "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}"
             }
+
+            SdkActions.LOG_OUT, SdkActions.DEFAULT -> {
+                url = config.iccUi
+            }
+
             else -> {}
         }
         loadUrlWithWebView(url)
@@ -168,6 +186,7 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
     override fun onAuthenticateWithIcc() {
+        SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
         onAuthenticate?.signIn()
     }
 
@@ -230,12 +249,14 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
     override fun shouldOverrideCreateWallet() {
+        SharedPrefProvider(this).saveState(SdkActions.WALLET)
         val connectBrowserUrl =
             "${config.mintBaseUrl}&success_url=${config.scheme}://mintbase.xyz"
         launchInAppBrowser(connectBrowserUrl)
     }
 
     override fun shouldOverrideSignTransaction(url: String) {
+        SharedPrefProvider(this).saveState(SdkActions.WALLET)
         val connectBrowserUrl =
             "${removeCallbackUrl(url)}&callback_url=${config.scheme}://mintbase.xyz"
         launchInAppBrowser(connectBrowserUrl)
@@ -263,7 +284,6 @@ class IccFanPassportActivity : AppCompatActivity(),
             val token = sdkParam.user?.authToken.orEmpty()
             val sharedPrefProvider = SharedPrefProvider(context)
             sharedPrefProvider.saveAccessToken(token)
-            sharedPrefProvider.saveUser(user)
             this.onAuthenticate = onAuthenticate
             val intent = Intent(context, IccFanPassportActivity::class.java)
             intent.putExtra(PARAM_EXTRA, sdkParam)
@@ -272,7 +292,10 @@ class IccFanPassportActivity : AppCompatActivity(),
 
 
         fun logOut(context: Activity) {
-            SharedPrefProvider(context).saveAccessToken("")
+            SharedPrefProvider(context).apply {
+                saveState(SdkActions.LOG_OUT)
+                saveAccessToken("")
+            }
         }
     }
 
@@ -289,9 +312,14 @@ class IccFanPassportActivity : AppCompatActivity(),
 
 interface OnAuthenticate {
     fun signIn()
+
+    fun onNavigateBack()
+
 }
 
 enum class SdkActions {
     DEFAULT,
-    SIGN_IN
+    SIGN_IN,
+    WALLET,
+    LOG_OUT
 }
