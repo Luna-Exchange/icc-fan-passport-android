@@ -52,22 +52,16 @@ dependencyResolutionManagement {
 
 **Launch this SDK **
 
-1. When a user is not authenticated.
+1. When a user is authenticated.
+
+```
+     IccFanPassportActivity.launch(this, user, onAuthenticate)
+```
+
+2.  When a user is not authenticated.
 
 ```
      IccFanPassportActivity.launch(context = this, onAuthenticate = onAuthenticate)
-```
-
-2. When a user is authenticated.
-
-```
-     IccFanPassportActivity.launch(this, user, null)
-```
-
-**To Create Wallet after Deeplink.**
-
-```
-     IccFanPassportActivity.connectWallet(context = this, publicKey = publicKey, accountId = accountId)
 ```
 
 **To Delegate Sign in to ICC after Signin has been clicked on the SDK**
@@ -75,8 +69,8 @@ dependencyResolutionManagement {
 ```
         val onAuthenticate = object : OnAuthenticate {
             override fun signIn()  {
-                val param = SdkParam(user)
-                IccFanPassportActivity.launch(this@MainActivity, param, null)
+                val user = User(email, authToken, name)
+                IccFanPassportActivity.launch(this@MainActivity, user, onAuthenticate)
             }
         }
 
@@ -89,16 +83,16 @@ dependencyResolutionManagement {
 ```
 
 
-**SdkParams**
+**Launch Arguments**
 
 
-This is an object that helps set the SDK. It  accepts optional arguments that include;
+This is a function that helps launch the SDK. It  accepts optional arguments that include;
 
-1. user of type **User**,
-2. entryPoint of type **String**, which can be gotten from the enum EntryPoint,
-3. public key of type **String** (required for wallet creation),
-4. accountId of type **String** (required for wallet creation),
-5. environment of enum type **Environment**
+1. context.
+2. user of type **User**,
+3. entryPoint of type **String**, which can be gotten from the enum EntryPoint,
+4. environment of enum type **Environment**: To declare the environment,
+5. an interface helps with sign-in delegation when the user attempts to sign in to fanpassport.
 
 **EntryPoint**
 
@@ -114,35 +108,30 @@ This is an object that helps set the SDK. It  accepts optional arguments that in
 
 **REWARDS**  -> Rewards page
 
+**Environment**
+
+**DEVELOPMENT** 
+
+**PRODUCTION**  
+
 
 **Wallet Creation Flow**
 
-To create a wallet on a fan passport, click Create Wallet in the fan passport module, and an in-app browser is launched. After creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the build method with the **publicKey** and **accountId** as shown below the deep link must be implemented to add **accountId** and **publicKey** to the builder method to complete the wallet creation flow.
+To create a wallet on a fan passport, click Create Wallet in the fan passport module, and an in-app browser is launched. After creating, when connect is clicked, it deep links back to the SDK, where the wallet creation flow IS complete.
 
-1. Add this to the manifest under the activity that will resolve the deep link; `MainActivity` in this case.
-2. Click on Create Wallet in the fan passport module, and an in-app browser is launched.
-4. after creating, when connect is clicked, it opens the ICC app, where D3 get the **accountId** and **publicKey** and then sends it into the SDK by calling the initialization method with the **publicKey** and **accountId** as shown below.
+1. Add this to the host app's manifest.
 
 ```
   <activity
-            android:name=".MainActivity"
+            android:name="com.insomnia.fanpassport.IccFanPassportActivity"
+            android:launchMode="singleTask"
             android:exported="true">
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="icc" />
-                <data android:host="mintbase.xyz" />
-            </intent-filter>
         </activity>
-```
-2. In the receiving activity, retrieve the **accountId** and **publicKey**, 3. Then, call this function
+```	
 
-```
-        IccFanPassportActivity.connectWallet(context = this, publicKey = publicKey, accountId = accountId)
-``` 
 
-3. Wallet created.
+2. Click on Create Wallet in the fan passport module, and an in-app browser is launched.
+3. after creating, when connect is clicked, the browser deep links into the SDK and the flow is completed.
 
 
 **Authentication Flow**
