@@ -110,6 +110,7 @@ class IccFanPassportActivity : AppCompatActivity(),
             SdkActions.LOG_OUT.name -> {
                 clearWebViewCache()
                 shouldRefresh = true
+                SharedPrefProvider(this).saveState(SdkActions.DEFAULT)
                 setupAndOpenFanPassport()
             }
             else -> {
