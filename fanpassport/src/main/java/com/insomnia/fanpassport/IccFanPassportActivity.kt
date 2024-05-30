@@ -9,8 +9,8 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
+import android.widget.Button
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -38,7 +38,6 @@ class IccFanPassportActivity : AppCompatActivity(),
     private lateinit var config: EnvConfig
     private lateinit var sharedPrefProvider: SharedPrefProvider
     private var shouldRefresh = true
-    private var signInMap = HashMap<String, Int>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,13 +186,13 @@ class IccFanPassportActivity : AppCompatActivity(),
 
     override fun onNavigateBack() {
         finish()
+        onAuthenticate?.onNavigateBack()
     }
 
 
     override fun onAuthenticateWithIcc() {
-        Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show()
-//            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
-//            onAuthenticate?.signIn()
+            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+            onAuthenticate?.signIn()
     }
 
     override fun onResume() {

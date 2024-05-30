@@ -1,5 +1,6 @@
 package com.iccfan.passport
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNavigateBack() {
+                val intent = Intent(this@MainActivity, AnotherActivity::class.java)
+                startActivity(intent)
 
             }
         }
