@@ -9,7 +9,6 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
-import android.widget.Button
 import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -83,6 +82,7 @@ class IccFanPassportActivity : AppCompatActivity(),
     private fun openFanPassport() {
         val token = sharedPrefProvider.getAccessToken()
         if (token.isEmpty()) {
+            clearWebViewCache()
             val url = config.iccUi
             loadUrlWithWebView(url)
         } else {
@@ -164,6 +164,7 @@ class IccFanPassportActivity : AppCompatActivity(),
             }
 
             SdkActions.LOG_OUT, SdkActions.DEFAULT -> {
+                clearWebViewCache()
                 url = config.iccUi
             }
 
