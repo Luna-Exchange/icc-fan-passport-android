@@ -10,6 +10,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -107,12 +108,14 @@ class IccFanPassportActivity : AppCompatActivity(),
             SdkActions.WALLET.name -> {
                 handleCreateWalletDeepLink(intent)
             }
+
             SdkActions.LOG_OUT.name -> {
                 clearWebViewCache()
                 shouldRefresh = true
                 SharedPrefProvider(this).saveState(SdkActions.DEFAULT)
                 setupAndOpenFanPassport()
             }
+
             else -> {
                 shouldRefresh = true
                 setupAndOpenFanPassport()
@@ -157,7 +160,8 @@ class IccFanPassportActivity : AppCompatActivity(),
         val token = sharedPrefProvider.getAccessToken()
         when (arguments!!.action) {
             SdkActions.SIGN_IN -> {
-                url = "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}&icc_client=mobile_app"
+                url =
+                    "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}&icc_client=mobile_app"
             }
 
             SdkActions.LOG_OUT, SdkActions.DEFAULT -> {
@@ -187,12 +191,9 @@ class IccFanPassportActivity : AppCompatActivity(),
 
 
     override fun onAuthenticateWithIcc() {
-        val value = signInMap[SdkActions.SIGN_IN.name] ?: 0
-        if (value < 1) {
-            signInMap[SdkActions.SIGN_IN.name] = value + 1
-            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
-            onAuthenticate?.signIn()
-        }
+        Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show()
+//            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+//            onAuthenticate?.signIn()
     }
 
     override fun onResume() {
@@ -229,9 +230,11 @@ class IccFanPassportActivity : AppCompatActivity(),
         webView.visibility = View.VISIBLE
         progressBar.visibility = View.GONE
         background.visibility = View.GONE
-        loadUrlWithWebView(
+        webView.evaluateJavascript(
             """
     javascript:(function() {
+     if (!window.listenersAdded) {
+      window.listenersAdded = true;
         window.parent.addEventListener('navigate-to-icc', function(event) {
             Android.receiveEvent(JSON.stringify(event));
         });
@@ -247,8 +250,9 @@ class IccFanPassportActivity : AppCompatActivity(),
         window.parent.addEventListener('fan-passport-sign-out', function(event) {
             Android.receivePredictionEvent(JSON.stringify(event));
         });
+        }
     })()
-    """
+    """, null
         )
     }
 
