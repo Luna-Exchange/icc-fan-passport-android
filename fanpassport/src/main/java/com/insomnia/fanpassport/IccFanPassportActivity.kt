@@ -186,7 +186,6 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
     override fun onNavigateBack() {
-        finish()
         onAuthenticate?.onNavigateBack()
     }
 
