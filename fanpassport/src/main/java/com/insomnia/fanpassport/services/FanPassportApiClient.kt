@@ -20,10 +20,6 @@ object FanPassportApiClient {
     }
 
     private fun createOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().also {
-                it.level = HttpLoggingInterceptor.Level.BODY
-            })
-            .build()
+        return OkHttpClient.Builder().build()
     }
 }

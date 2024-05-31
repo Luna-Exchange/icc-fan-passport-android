@@ -186,6 +186,7 @@ class IccFanPassportActivity : AppCompatActivity(),
     }
 
     override fun onNavigateBack() {
+        finish()
         onAuthenticate?.onNavigateBack()
     }
 
@@ -224,7 +225,7 @@ class IccFanPassportActivity : AppCompatActivity(),
         progressBar.visibility = View.VISIBLE
     }
 
-    override fun OnPageFinished() {
+    override fun onPageFinished() {
 
         webView.visibility = View.VISIBLE
         progressBar.visibility = View.GONE

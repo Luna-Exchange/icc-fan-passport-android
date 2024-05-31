@@ -20,7 +20,7 @@ class IccWebViewClient(private val onIccWebViewInterface: IccWebViewInterface) :
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
-        onIccWebViewInterface.OnPageFinished()
+        onIccWebViewInterface.onPageFinished()
     }
 }
 
@@ -28,7 +28,7 @@ class IccWebViewClient(private val onIccWebViewInterface: IccWebViewInterface) :
 interface IccWebViewInterface {
     fun onPageStarted()
 
-    fun OnPageFinished()
+    fun onPageFinished()
 
     fun shouldOverrideCreateWallet()
 
