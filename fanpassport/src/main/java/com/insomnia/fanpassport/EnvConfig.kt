@@ -15,7 +15,7 @@ class EnvConfig(private val environment: Environment = Environment.DEVELOPMENT) 
         get() = if (environment == Environment.DEVELOPMENT) "iccdev" else "icc"
 
     val fantasyUri : String
-        get() = if (environment == Environment.DEVELOPMENT) "iccdev://react-fe-en.icc-dev.deltatre.digital/fantasy-game" else " icc://www.icc-cricket.com/fantasy-game"
+        get() = if (environment == Environment.DEVELOPMENT) "iccdev://react-fe-en.icc-dev.deltatre.digital/fantasy-game" else "icc://www.icc-cricket.com/fantasy-game"
 
     val predictionUri : String
         get() = if (environment == Environment.DEVELOPMENT) "iccdev://react-fe-en.icc-dev.deltatre.digital/tournaments/t20cricketworldcup/matches" else "icc://www.icc-cricket.com/tournaments/t20cricketworldcup/matches"
