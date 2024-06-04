@@ -17,7 +17,7 @@ Steps to Install
 
 `implementation 'com.github.Luna-Exchange:icc-fan-passport-android:x.x.x`
 
-where `x.x.x` is the latest version `1.0.9`
+where `x.x.x` is the latest version `1.0.16`
 
 2. In settings.gradle
 
