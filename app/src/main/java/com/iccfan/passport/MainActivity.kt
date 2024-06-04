@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         val onAuthenticate = object : OnAuthenticate {
             override fun signIn() {
-                IccFanPassportActivity.launch(context = this@MainActivity, user = user, onAuthenticate = this, entryPoint = EntryPoint.DEFAULT.path, environment = Environment.PRODUCTION)
+                IccFanPassportActivity.launch(context = this@MainActivity, user = user, onAuthenticate = this, entryPoint = EntryPoint.DEFAULT.path, environment = Environment.DEVELOPMENT)
             }
 
             override fun onNavigateBack() {
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        IccFanPassportActivity.launch(context = this,   onAuthenticate = onAuthenticate, environment = Environment.PRODUCTION, entryPoint = EntryPoint.DEFAULT.path)
+        IccFanPassportActivity.launch(context = this,   onAuthenticate = onAuthenticate, environment = Environment.DEVELOPMENT, entryPoint = EntryPoint.DEFAULT.path, fantasyUri = "halllo", predictorUri = "hfgyttt")
 
 
 

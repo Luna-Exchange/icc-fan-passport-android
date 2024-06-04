@@ -10,6 +10,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -192,8 +193,8 @@ class IccFanPassportActivity : AppCompatActivity(),
 
 
     override fun onAuthenticateWithIcc() {
-            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
-            onAuthenticate?.signIn()
+        SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+        onAuthenticate?.signIn()
     }
 
     override fun onResume() {
@@ -206,13 +207,17 @@ class IccFanPassportActivity : AppCompatActivity(),
 
 
     override fun onDeepLinkToFantasy() {
-        val deepLinkUri = Uri.parse(config.fantasyUri)
+        val fantasyUri =
+            if (arguments?.fantasyUri.isNullOrEmpty()) config.fantasyUri else arguments?.fantasyUri.orEmpty()
+        val deepLinkUri = Uri.parse(fantasyUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
     }
 
     override fun onDeepLinkToPrediction() {
-        val deepLinkUri = Uri.parse(config.predictionUri)
+        val predictorUri =
+            if (arguments?.predictorUri.isNullOrEmpty()) config.predictionUri else arguments?.predictorUri.orEmpty()
+        val deepLinkUri = Uri.parse(predictorUri)
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
         startActivity(intent)
     }
@@ -279,16 +284,25 @@ class IccFanPassportActivity : AppCompatActivity(),
             user: User? = null,
             entryPoint: String = EntryPoint.ONBOARDING.path,
             environment: Environment = Environment.DEVELOPMENT,
+            predictorUri: String = "",
+            fantasyUri: String = "",
             onAuthenticate: OnAuthenticate? = null
         ) {
-            val sdkParam = if (user != null) SdkParam(user).copy(
-                action = SdkActions.SIGN_IN,
+            val param = SdkParam(
                 entryPoint = entryPoint,
-                environment = environment
-            ) else SdkParam(
-                entryPoint = entryPoint,
-                environment = environment
+                environment = environment,
+                fantasyUri = fantasyUri, predictorUri = predictorUri,
             )
+            val sdkParam = if (user != null) {
+                param.copy(
+                    user = user,
+                    action = SdkActions.SIGN_IN,
+                    entryPoint = entryPoint,
+                    environment = environment
+                )
+            } else {
+                param
+            }
             val token = sdkParam.user?.authToken.orEmpty()
             val sharedPrefProvider = SharedPrefProvider(context)
             sharedPrefProvider.saveAccessToken(token)

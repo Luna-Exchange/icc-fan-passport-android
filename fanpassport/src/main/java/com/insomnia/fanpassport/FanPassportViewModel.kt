@@ -16,12 +16,12 @@ import kotlinx.coroutines.launch
 
 class FanPassportViewModel : ViewModel() {
 
-    private val mToken  = MutableStateFlow<Result>(Result.Default)
+    private val mToken = MutableStateFlow<Result>(Result.Default)
 
-    val token : StateFlow<Result>
+    val token: StateFlow<Result>
         get() = mToken
 
-    fun encodeUser(user: User?, baseUrl : String) {
+    fun encodeUser(user: User?, baseUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 if (user == null) return@launch
@@ -35,7 +35,7 @@ class FanPassportViewModel : ViewModel() {
                 tokenFlow.collect {
                     mToken.emit(Result.Success(it.data.token))
                 }
-            } catch (e : Exception) {
+            } catch (e: Exception) {
 
             }
         }
@@ -44,14 +44,22 @@ class FanPassportViewModel : ViewModel() {
 
 
 sealed class Result {
-    data class Success(val token : String) : Result()
-    data class Failed(val message : String) : Result()
+    data class Success(val token: String) : Result()
+    data class Failed(val message: String) : Result()
 
     object Default : Result()
 
 }
+
 @Parcelize
 data class User(val authToken: String, val name: String, val email: String) : Parcelable
 
 @Parcelize
-data class SdkParam(var user: User? = null, var entryPoint : String = "", var environment: Environment = Environment.DEVELOPMENT, var action : SdkActions = SdkActions.DEFAULT) : Parcelable
+data class SdkParam(
+    var user: User? = null,
+    var entryPoint: String = "",
+    var environment: Environment = Environment.DEVELOPMENT,
+    var action: SdkActions = SdkActions.DEFAULT,
+    val fantasyUri: String = "",
+    val predictorUri: String = "",
+) : Parcelable
