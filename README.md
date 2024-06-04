@@ -89,10 +89,12 @@ dependencyResolutionManagement {
 This is a function that helps launch the SDK. It  accepts optional arguments that include;
 
 1. context.
-2. user of type **User**,
-3. entryPoint of type **String**, which can be gotten from the enum EntryPoint,
-4. environment of enum type **Environment**: To declare the environment,
-5. an interface helps with sign-in delegation when the user attempts to sign in to fanpassport.
+2. user of type **User**.
+3. entryPoint of type **String**can be obtained from the enum EntryPoint.
+4. environment of enum type **Environment**: To declare the environment.
+5. fantasyUri: URI to deep link into fantasy games. in the form `scheme:\\url`
+6. predictorUri: URI to deep link into predictor games. in the form `scheme:\\url`
+7. an interface helps with sign-in delegation when the user attempts to sign in to fanpassport.
 
 **EntryPoint**
 
