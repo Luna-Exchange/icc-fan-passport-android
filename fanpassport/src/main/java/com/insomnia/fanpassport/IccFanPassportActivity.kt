@@ -25,6 +25,7 @@ import java.net.URL
 const val PARAM_EXTRA = "USER_DETAILS"
 const val MINT_BASE_CREATE_WALLET = "connect"
 const val MINT_BASE_SIGN_TRANSACTION = "sign"
+const val CLICK_UP_LINK = "forms.clickup"
 
 
 class IccFanPassportActivity : AppCompatActivity(),
@@ -273,6 +274,10 @@ class IccFanPassportActivity : AppCompatActivity(),
         val connectBrowserUrl =
             "${removeCallbackUrl(url)}&callback_url=${config.scheme}://mintbase.xyz"
         launchInAppBrowser(connectBrowserUrl)
+    }
+
+    override fun shouldOverrideCustomersFeedBackForm() {
+        launchInAppBrowser("https://forms.clickup.com/9017112878/f/8cqce9e-4997/UI9BXLHMZM7OOXZXX5")
     }
 
 

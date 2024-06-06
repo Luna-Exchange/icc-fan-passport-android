@@ -15,6 +15,8 @@ class IccWebViewClient(private val onIccWebViewInterface: IccWebViewInterface) :
             onIccWebViewInterface.shouldOverrideCreateWallet()
         } else if (url.contains(MINT_BASE_SIGN_TRANSACTION)) {
             onIccWebViewInterface.shouldOverrideSignTransaction(url)
+        } else if (url.contains(CLICK_UP_LINK)) {
+            onIccWebViewInterface.shouldOverrideCustomersFeedBackForm()
         }
         return true
     }
@@ -33,4 +35,6 @@ interface IccWebViewInterface {
     fun shouldOverrideCreateWallet()
 
     fun shouldOverrideSignTransaction(url: String)
+
+    fun shouldOverrideCustomersFeedBackForm()
 }
